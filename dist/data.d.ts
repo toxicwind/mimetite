@@ -2,9 +2,9 @@
  * Canonical provider data — the single source of truth for the estate.
  *
  * Reconciled 2026-09-30 from:
- * - tools/estate-scripts-router/estate-scripts-router-ts/router_config.ts
+ * - estate/mesh/router/estate-scripts-router/estate-scripts-router-ts/router_config.ts
  *   (PROVIDERS, PROVIDER_MODELS, CODING, DEAD_MODEL_IDS)
- * - projects/range/ranch/stockyard/herd/internal/astmatrix/providers.go
+ * - estate/mesh/router/herd/internal/astmatrix/providers.go
  *   (defaultProviders, codingAlias)
  *
  * Reconciliation notes (newer audit wins on conflict):
@@ -14,7 +14,7 @@
  *   EOL 2026-08-26 → deadIds). Herd gains nemotron-3-nano-omni-30b-a3b-reasoning.
  * - groq seeds: identical in both (6); the 4 verified-dead 2026-09-30 stay
  *   in seeds but are filtered by deadIds everywhere (cold start included).
- * - llama-swap seeds: the canonical stable role names. The TS router
+ * - herd seeds: the canonical stable role names. The TS router
  *   overlays its runtime LOCAL_ROLES (best-models.json) at catalog build;
  *   herd serves these names directly.
  * - mistral: baseUrl WITHOUT the /v1 segment; the mistral adapter appends

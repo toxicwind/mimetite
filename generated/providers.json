@@ -1,8 +1,8 @@
 {
-  "$schema": "ranch-roost/v1",
-  "generatedAt": "2026-10-13T07:27:35.000Z",
-  "generator": "@ranch/roost codegen — DO NOT EDIT BY HAND",
-  "provenance": "@ranch/roost src/data.ts",
+  "$schema": "estate-pinax/v1",
+  "generatedAt": "2026-10-17T05:17:24.000Z",
+  "generator": "@toxicwind/pinax codegen — DO NOT EDIT BY HAND",
+  "provenance": "@toxicwind/pinax src/data.ts",
   "adapters": [
     "openai",
     "google-v1beta",
@@ -379,6 +379,25 @@
       ],
       "adapter": "openai",
       "auth": "bearer"
+    },
+    {
+      "name": "google",
+      "displayName": "Google (EAP interactions)",
+      "baseUrl": "http://127.0.0.1:25109/gemini-eap-interactions",
+      "keyEnv": "",
+      "keyEnvs": [],
+      "adapter": "static",
+      "auth": "none",
+      "staticModels": [
+        "models/gemini-flash-tool-retrieval",
+        "models/gemini-3.8-flash",
+        "models/gemini-3.7-flash",
+        "models/gemini-3.6-flash",
+        "models/gemini-3.5-flash",
+        "models/gemini-3.1-pro-preview",
+        "models/gemini-3-flash-preview",
+        "models/gemini-2.5-flash"
+      ]
     },
     {
       "name": "github",
@@ -996,6 +1015,7 @@
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash"
     ],
+    "google": [],
     "github": [
       "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
@@ -1164,49 +1184,9 @@
   },
   "seedsContract": "Cold-start only: served while a provider has never had a successful discovery; inert afterwards. Never hand-edit model membership here — discovery owns it.",
   "aliases": {
-    "ling": [
-      "openrouter",
-      "inclusionai/ling-3.0-flash-fin:free"
-    ],
-    "ling-flash": [
-      "openrouter",
-      "inclusionai/ling-3.0-flash:free"
-    ],
-    "laguna-xs": [
-      "openrouter",
-      "poolside/laguna-xs-2.1:free"
-    ],
-    "laguna-s": [
-      "openrouter",
-      "poolside/laguna-s-2.1:free"
-    ],
-    "gemma4-31b": [
-      "openrouter",
-      "google/gemma-4-31b-it:free"
-    ],
-    "gemma4-26b": [
-      "openrouter",
-      "google/gemma-4-26b-a4b-it:free"
-    ],
-    "nemotron-super": [
-      "openrouter",
-      "nvidia/nemotron-3-super-120b-a12b:free"
-    ],
     "nemotron-nano": [
       "nvidia",
       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"
-    ],
-    "nemotron-ultra": [
-      "openrouter",
-      "nvidia/nemotron-3-ultra-550b-a55b:free"
-    ],
-    "nemotron-omni": [
-      "openrouter",
-      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
-    ],
-    "north-mini": [
-      "openrouter",
-      "cohere/north-mini-code:free"
     ],
     "nim-nemotron-super": [
       "nvidia",
@@ -1287,22 +1267,6 @@
     "gemini-2.5-flash": [
       "google",
       "models/gemini-2.5-flash"
-    ],
-    "mistral-small": [
-      "mistral",
-      "mistral-small-latest"
-    ],
-    "codestral": [
-      "mistral",
-      "codestral-latest"
-    ],
-    "mistral-large": [
-      "mistral",
-      "mistral-large-latest"
-    ],
-    "mistral-medium": [
-      "mistral",
-      "mistral-medium-latest"
     ],
     "groq-llama-3.3-70b": [
       "groq",

@@ -2,9 +2,9 @@
  * Canonical provider data — the single source of truth for the estate.
  *
  * Reconciled 2026-09-30 from:
- * - ranch/mesh/router/estate-scripts-router/estate-scripts-router-ts/router_config.ts
+ * - estate/mesh/router/estate-scripts-router/estate-scripts-router-ts/router_config.ts
  *   (PROVIDERS, PROVIDER_MODELS, CODING, DEAD_MODEL_IDS)
- * - ranch/mesh/router/herd/internal/astmatrix/providers.go
+ * - estate/mesh/router/herd/internal/astmatrix/providers.go
  *   (defaultProviders, codingAlias)
  *
  * Reconciliation notes (newer audit wins on conflict):
@@ -938,6 +938,42 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     },
   },
   {
+    name: "google",
+    displayName: "Google (EAP interactions)",
+    // keypool injects one of the six gen-lang-client-0111199472 EAP keys per
+    // request and rewrites OpenAI bodies onto the Interactions API, so there is
+    // no client credential and no /models endpoint to read. auth "none" +
+    // staticModels is the honest shape; the previous keyEnv: GOOGLE_API_KEY
+    // named a secret that no longer exists and 401'd every request.
+    // Restored 2026-10-16: cut by accident in 63689c5; the flock overlay's
+    // EAP entry (and :25109 keypool sidecar) still depend on it.
+    baseUrl: "http://127.0.0.1:25109/gemini-eap-interactions",
+    keyEnv: "",
+    auth: "none",
+    adapter: "static",
+    staticModels: [
+      "models/gemini-flash-tool-retrieval",
+      "models/gemini-3.8-flash",
+      "models/gemini-3.7-flash",
+      "models/gemini-3.6-flash",
+      "models/gemini-3.5-flash",
+      "models/gemini-3.1-pro-preview",
+      "models/gemini-3-flash-preview",
+      "models/gemini-2.5-flash",
+    ],
+    seeds: [],
+    contextLengths: {
+      "models/gemini-flash-tool-retrieval": 1000000,
+      "models/gemini-3.8-flash": 1000000,
+      "models/gemini-3.7-flash": 1000000,
+      "models/gemini-3.6-flash": 1000000,
+      "models/gemini-3.5-flash": 1000000,
+      "models/gemini-3.1-pro-preview": 1000000,
+      "models/gemini-3-flash-preview": 1000000,
+      "models/gemini-2.5-flash": 1000000,
+    },
+  },
+  {
     name: "github",
     displayName: "GitHub Models",
     // 2026-10-02: models.inference.ai.azure.com is DNS-dead; GitHub Models moved to models.github.ai.
@@ -1220,20 +1256,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
  * aliases stay router-local overlays.
  */
 export const MODEL_ALIASES: Record<string, ModelAlias> = {
-  ling: ["openrouter", "inclusionai/ling-3.0-flash-fin:free"],
-  "ling-flash": ["openrouter", "inclusionai/ling-3.0-flash:free"],
-  "laguna-xs": ["openrouter", "poolside/laguna-xs-2.1:free"],
-  "laguna-s": ["openrouter", "poolside/laguna-s-2.1:free"],
-  "gemma4-31b": ["openrouter", "google/gemma-4-31b-it:free"],
-  "gemma4-26b": ["openrouter", "google/gemma-4-26b-a4b-it:free"],
-  "nemotron-super": ["openrouter", "nvidia/nemotron-3-super-120b-a12b:free"],
   "nemotron-nano": ["nvidia", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"],
-  "nemotron-ultra": ["openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free"],
-  "nemotron-omni": [
-    "openrouter",
-    "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
-  ],
-  "north-mini": ["openrouter", "cohere/north-mini-code:free"],
   "nim-nemotron-super": ["nvidia", "nvidia/nemotron-3-super-120b-a12b"],
   "nim-nemotron-omni": [
     "nvidia",
@@ -1266,10 +1289,6 @@ export const MODEL_ALIASES: Record<string, ModelAlias> = {
   "gemini-3.1-pro": ["google", "models/gemini-3.1-pro-preview"],
   "gemini-3-flash": ["google", "models/gemini-3-flash-preview"],
   "gemini-2.5-flash": ["google", "models/gemini-2.5-flash"],
-  "mistral-small": ["mistral", "mistral-small-latest"],
-  codestral: ["mistral", "codestral-latest"],
-  "mistral-large": ["mistral", "mistral-large-latest"],
-  "mistral-medium": ["mistral", "mistral-medium-latest"],
   "groq-llama-3.3-70b": ["groq", "llama-3.3-70b-versatile"],
   "groq-qwen3-32b": ["groq", "qwen/qwen3-32b"],
   "groq-qwen3.6-27b": ["groq", "qwen/qwen3.6-27b"],

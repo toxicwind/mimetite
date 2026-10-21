@@ -1,5 +1,5 @@
 /**
- * @ranch/roost — master provider catalog for the estate estate.
+ * @toxicwind/pinax — master provider catalog for the estate estate.
  *
  * Single source of truth for: provider definitions (base URL, key env,
  * endpoint adapter per /models shape), live discovery, alias map, curated
@@ -14,6 +14,8 @@ export type { BuiltRequest, ModelsAdapter } from "./adapters.ts";
 export { discover } from "./discovery.ts";
 export type { DiscoverOptions, DiscoveryResult } from "./discovery.ts";
 export { ModelCatalog, PRUNE_AFTER_MISSES } from "./catalog.ts";
-export { DEAD_MODEL_IDS, MODEL_ALIASES, PROVIDER_DEFS, } from "./data.ts";
-export { buildProvidersGo, buildProvidersJson, buildProvidersRust, emitAll } from "./codegen.ts";
+export { DEAD_MODEL_IDS, MODEL_ALIASES, PROVIDER_DEFS } from "./data.ts";
+export { displayNameFor, keyEnvFor, KNOWN_ENDPOINTS, loadCatalogProviderDefs, loadDropInDefs, loadProviderDefs, synthesizeProviderDef, } from "./auto-loader.ts";
+export type { AutoLoadOptions, AutoLoadResult } from "./auto-loader.ts";
+export { buildInstalledKappaJson, buildInstalledTauYaml, buildProvidersGo, buildProvidersJson, buildProvidersKappaJson, buildProvidersRust, buildProvidersTauYaml, emitAll, } from "./codegen.ts";
 export type { CodegenInput } from "./codegen.ts";

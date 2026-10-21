@@ -475,9 +475,9 @@ class ModelCatalog {
       };
     }
     return {
-      contract: "ranch-roost/live-catalog/v1",
+      contract: "estate-pinax/live-catalog/v1",
       generatedAt: nowIso(),
-      generator: "@ranch/roost ModelCatalog \u2014 DO NOT EDIT BY HAND",
+      generator: "@toxicwind/pinax ModelCatalog \u2014 DO NOT EDIT BY HAND",
       deadIds: [...this.deadIds].sort(),
       providers
     };
@@ -798,6 +798,28 @@ var PROVIDER_DEFS = [
       "deepseek-v4-flash": 256000,
       "deepseek-v4-pro": 256000,
       "deepseek-v3.2-chat": 256000
+    }
+  },
+  {
+    name: "freeinference",
+    displayName: "FreeInference",
+    baseUrl: "https://freeinference.org/v1",
+    keyEnv: "FREEINFERENCE_API_KEY",
+    auth: "bearer",
+    adapter: "openai",
+    seeds: [
+      "glm-5.3-flash",
+      "minimax-m3",
+      "qwen3.6-35b",
+      "diffusiongemma",
+      "deepseek-v4-flash"
+    ],
+    contextLengths: {
+      "glm-5.3-flash": 1e6,
+      "minimax-m3": 1e6,
+      "qwen3.6-35b": 262000,
+      diffusiongemma: 262000,
+      "deepseek-v4-flash": 1e6
     }
   },
   {
@@ -1359,6 +1381,35 @@ var PROVIDER_DEFS = [
     }
   },
   {
+    name: "google",
+    displayName: "Google (EAP interactions)",
+    baseUrl: "http://127.0.0.1:25109/gemini-eap-interactions",
+    keyEnv: "",
+    auth: "none",
+    adapter: "static",
+    staticModels: [
+      "models/gemini-flash-tool-retrieval",
+      "models/gemini-3.8-flash",
+      "models/gemini-3.7-flash",
+      "models/gemini-3.6-flash",
+      "models/gemini-3.5-flash",
+      "models/gemini-3.1-pro-preview",
+      "models/gemini-3-flash-preview",
+      "models/gemini-2.5-flash"
+    ],
+    seeds: [],
+    contextLengths: {
+      "models/gemini-flash-tool-retrieval": 1e6,
+      "models/gemini-3.8-flash": 1e6,
+      "models/gemini-3.7-flash": 1e6,
+      "models/gemini-3.6-flash": 1e6,
+      "models/gemini-3.5-flash": 1e6,
+      "models/gemini-3.1-pro-preview": 1e6,
+      "models/gemini-3-flash-preview": 1e6,
+      "models/gemini-2.5-flash": 1e6
+    }
+  },
+  {
     name: "github",
     displayName: "GitHub Models",
     baseUrl: "https://models.github.ai/inference",
@@ -1616,20 +1667,7 @@ var PROVIDER_DEFS = [
   }
 ];
 var MODEL_ALIASES = {
-  ling: ["openrouter", "inclusionai/ling-3.0-flash-fin:free"],
-  "ling-flash": ["openrouter", "inclusionai/ling-3.0-flash:free"],
-  "laguna-xs": ["openrouter", "poolside/laguna-xs-2.1:free"],
-  "laguna-s": ["openrouter", "poolside/laguna-s-2.1:free"],
-  "gemma4-31b": ["openrouter", "google/gemma-4-31b-it:free"],
-  "gemma4-26b": ["openrouter", "google/gemma-4-26b-a4b-it:free"],
-  "nemotron-super": ["openrouter", "nvidia/nemotron-3-super-120b-a12b:free"],
   "nemotron-nano": ["nvidia", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"],
-  "nemotron-ultra": ["openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free"],
-  "nemotron-omni": [
-    "openrouter",
-    "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
-  ],
-  "north-mini": ["openrouter", "cohere/north-mini-code:free"],
   "nim-nemotron-super": ["nvidia", "nvidia/nemotron-3-super-120b-a12b"],
   "nim-nemotron-omni": [
     "nvidia",
@@ -1659,10 +1697,6 @@ var MODEL_ALIASES = {
   "gemini-3.1-pro": ["google", "models/gemini-3.1-pro-preview"],
   "gemini-3-flash": ["google", "models/gemini-3-flash-preview"],
   "gemini-2.5-flash": ["google", "models/gemini-2.5-flash"],
-  "mistral-small": ["mistral", "mistral-small-latest"],
-  codestral: ["mistral", "codestral-latest"],
-  "mistral-large": ["mistral", "mistral-large-latest"],
-  "mistral-medium": ["mistral", "mistral-medium-latest"],
   "groq-llama-3.3-70b": ["groq", "llama-3.3-70b-versatile"],
   "groq-qwen3-32b": ["groq", "qwen/qwen3-32b"],
   "groq-qwen3.6-27b": ["groq", "qwen/qwen3.6-27b"],
@@ -1719,7 +1753,7 @@ function loadProviderDefs(staticDefs, opts = {}) {
     byName.set(d.name, d);
   const synthesized = [];
   const endpoints = { ...KNOWN_ENDPOINTS, ...opts.endpoints ?? {} };
-  const notify = opts.onSynthesize ?? ((id, def) => console.warn(`[roost] provider "${id}" has no curated PROVIDER_DEFS entry \u2014 ` + `auto-synthesized best-effort def (keyEnv ${def.keyEnv}). ` + `Promote it to ranch/mesh/catalog/src/data.ts to silence this.`));
+  const notify = opts.onSynthesize ?? ((id, def) => console.warn(`[pinax] provider "${id}" has no curated PROVIDER_DEFS entry \u2014 ` + `auto-synthesized best-effort def (keyEnv ${def.keyEnv}). ` + `Promote it to estate/mesh/catalog/src/data.ts to silence this.`));
   for (const id of opts.requiredIds ?? []) {
     if (!byName.has(id)) {
       const def = synthesizeProviderDef(id, endpoints[id]);
@@ -1797,9 +1831,9 @@ function keyEnvsOf(d) {
 }
 function buildProvidersJson(input) {
   const doc = {
-    $schema: "ranch-roost/v1",
+    $schema: "estate-pinax/v1",
     generatedAt: codegenTimestamp(),
-    generator: "@ranch/roost codegen \u2014 DO NOT EDIT BY HAND",
+    generator: "@toxicwind/pinax codegen \u2014 DO NOT EDIT BY HAND",
     ...input.provenance ? { provenance: input.provenance } : {},
     adapters: ["openai", "google-v1beta", "mistral", "static", "none"],
     providers: input.defs.map((d) => ({
@@ -1827,6 +1861,98 @@ function buildProvidersJson(input) {
     deadIdsContract: "Permanent hand-managed tier (EOL notices). Never served, never re-admitted by discovery."
   };
   return JSON.stringify(doc, null, 2) + `
+`;
+}
+function buildProvidersKappaJson(input) {
+  const generatedAt = codegenTimestamp();
+  const provenance = input.provenance ? input.provenance : "unknown";
+  const providerMap = {};
+  for (const d of input.defs) {
+    if (d.enabled === false || d.routerLocal || d.name === "herd") {
+      continue;
+    }
+    const models = {};
+    const modelIds = d.staticModels && d.staticModels.length > 0 ? d.staticModels : d.seeds && d.seeds.length > 0 ? d.seeds : [];
+    for (const id of modelIds) {
+      models[id] = {
+        name: id,
+        limit: {
+          context: d.contextLengths?.[id] ?? 128000,
+          output: 8192
+        }
+      };
+    }
+    let apiKey = "none";
+    if (d.name === "flock") {
+      apiKey = "!cat /home/toxic/.tau/flock.key";
+    } else if (d.name === "hodos") {
+      apiKey = "herd-local";
+    } else if (d.auth !== "none" && d.keyEnv) {
+      apiKey = `{env:${d.keyEnv}}`;
+    }
+    providerMap[d.name] = {
+      npm: "@ai-sdk/openai-compatible",
+      name: d.displayName ?? d.name,
+      options: {
+        baseURL: d.baseUrl,
+        apiKey
+      },
+      models
+    };
+  }
+  const doc = {
+    $schema: "https://app.kappa.ai/config.json",
+    contract: "estate-pinax/kappa-catalog/v1",
+    generator: "@toxicwind/pinax codegen \u2014 kappa target (full profile) \u2014 DO NOT EDIT BY HAND",
+    provenance,
+    generatedAt,
+    deadIds: [...input.deadIds].sort(),
+    aliases: input.aliases,
+    seeds: Object.fromEntries(input.defs.map((d) => [d.name, d.seeds])),
+    provider: providerMap,
+    providers: input.defs.map((d) => ({
+      name: d.name,
+      ...d.displayName ? { displayName: d.displayName } : {},
+      baseUrl: d.baseUrl,
+      keyEnv: d.keyEnv,
+      ...d.keyEnvAlt ? { keyEnvAlt: d.keyEnvAlt } : {},
+      keyEnvs: keyEnvsOf(d),
+      adapter: d.adapter,
+      ...d.modelsPath ? { modelsPath: d.modelsPath } : {},
+      ...d.auth ? { auth: d.auth } : {},
+      ...d.headerName ? { headerName: d.headerName } : {},
+      ...d.queryParam ? { queryParam: d.queryParam } : {},
+      ...d.extraHeaders ? { extraHeaders: d.extraHeaders } : {},
+      ...d.staticModels ? { staticModels: d.staticModels } : {},
+      ...d.noModelsReason ? { noModelsReason: d.noModelsReason } : {},
+      ...d.enabled === false ? { enabled: false } : {},
+      ...d.routerLocal ? { routerLocal: true } : {}
+    }))
+  };
+  return JSON.stringify(doc, null, 2) + `
+`;
+}
+function buildInstalledKappaJson(input, env = process.env) {
+  const present = (name) => {
+    if (!name)
+      return false;
+    const v = env[name];
+    return typeof v === "string" && v.trim().length > 0;
+  };
+  const defs = input.defs.filter((d) => {
+    if (d.enabled === false || d.routerLocal)
+      return false;
+    if (d.name === "flock" || d.name === "herd" || d.name === "hodos" || d.auth === "none") {
+      return true;
+    }
+    const pool = keyEnvsOf(d);
+    if (pool.length === 0)
+      return true;
+    return pool.some(present);
+  });
+  const full = JSON.parse(buildProvidersKappaJson({ ...input, defs }));
+  full.generator = "@toxicwind/pinax codegen \u2014 kappa target (installed profile) \u2014 DO NOT EDIT BY HAND";
+  return JSON.stringify(full, null, 2) + `
 `;
 }
 function buildProvidersGo(input) {
@@ -1858,7 +1984,7 @@ ${fields.join(`
   const staticGo = input.defs.filter((d) => d.adapter === "static").map((d) => `	${jsonEscaped(d.name)}: ${goStringSlice(d.staticModels ?? [])},`).join(`
 `);
   const provenance = input.provenance ? input.provenance : "unknown";
-  return `// Code generated by @ranch/roost \u2014 DO NOT EDIT BY HAND.
+  return `// Code generated by @toxicwind/pinax \u2014 DO NOT EDIT BY HAND.
 // Regenerate with: bun run build  (in packages/providers)
 // Source of truth: packages/providers/src/data.ts
 // Generated at: ${generatedAt}
@@ -1944,7 +2070,7 @@ function buildProvidersRust(input) {
       `static_models: ${rustStrSlice(d.staticModels ?? [])},`,
       `context_lengths: ${rustCtxLengths(d.contextLengths ?? {})},`
     ];
-    return `    RoostProvider {
+    return `    PinaxProvider {
 ${fields.map((f) => `        ${f}`).join(`
 `)}
     },`;
@@ -1953,20 +2079,20 @@ ${fields.map((f) => `        ${f}`).join(`
   const deadIds = [...input.deadIds].sort();
   const aliases = Object.keys(input.aliases).sort().map((k) => `    (${jsonEscaped(k)}, ${jsonEscaped(input.aliases[k][0])}, ${jsonEscaped(input.aliases[k][1])}),`).join(`
 `);
-  return `// Code generated by @ranch/roost \u2014 DO NOT EDIT BY HAND.
+  return `// Code generated by @toxicwind/pinax \u2014 DO NOT EDIT BY HAND.
 // Regenerate with: bun run build  (in mesh/catalog)
 // Source of truth: mesh/catalog/src/data.ts
 // Generated at: ${generatedAt}
 
-/// Provenance of the Roost catalog revision this module was generated from.
-pub const ROOST_PROVENANCE: &str = ${jsonEscaped(provenance)};
+/// Provenance of the Pinax catalog revision this module was generated from.
+pub const PINAX_PROVENANCE: &str = ${jsonEscaped(provenance)};
 
-/// One provider's wire data, generated from the Roost catalog.
+/// One provider's wire data, generated from the Pinax catalog.
 /// Flock builds its operational ProviderDefs from this table merged with
 /// flock's hand-maintained overlay (elo/weight/free-tier/model-map); the
 /// wire fields here (base URLs, key env vars, adapters, seeds) are never
 /// hand-edited.
-pub struct RoostProvider {
+pub struct PinaxProvider {
     /// Canonical provider key, e.g. "groq".
     pub name: &'static str,
     pub display_name: &'static str,
@@ -1990,7 +2116,7 @@ pub struct RoostProvider {
     pub router_local: bool,
     /// Disabled providers are never fetched and never served.
     pub enabled: bool,
-    /// Cold-start seeds ONLY. May name dead IDs \u2014 filter ROOST_DEAD_IDS.
+    /// Cold-start seeds ONLY. May name dead IDs \u2014 filter PINAX_DEAD_IDS.
     pub seeds: &'static [&'static str],
     /// Adapter "static": the model list, carried in the definition.
     pub static_models: &'static [&'static str],
@@ -1998,19 +2124,26 @@ pub struct RoostProvider {
     pub context_lengths: &'static [(&'static str, u64)],
 }
 
-/// The canonical provider table, generated from the Roost catalog.
-pub const ROOST_PROVIDERS: &[RoostProvider] = &[
+/// The canonical provider table, generated from the Pinax catalog.
+pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
 ${defs}
 ];
 
 /// Permanent EOL tier (hand-managed). Never served, never re-admitted:
 /// filter these out of seeds and live listings alike.
-pub const ROOST_DEAD_IDS: &[&str] = ${rustStrSlice(deadIds)};
+pub const PINAX_DEAD_IDS: &[&str] = ${rustStrSlice(deadIds)};
 
 /// Friendly alias -> (provider, canonical model id) (UX layer).
-pub const ROOST_ALIASES: &[(&str, &str, &str)] = &[
+pub const PINAX_ALIASES: &[(&str, &str, &str)] = &[
 ${aliases}
 ];
+
+// Backwards-compatibility aliases for legacy consumers.
+pub type RoostProvider = PinaxProvider;
+pub const ROOST_PROVENANCE: &str = PINAX_PROVENANCE;
+pub const ROOST_PROVIDERS: &[PinaxProvider] = PINAX_PROVIDERS;
+pub const ROOST_DEAD_IDS: &[&str] = PINAX_DEAD_IDS;
+pub const ROOST_ALIASES: &[(&str, &str, &str)] = PINAX_ALIASES;
 `;
 }
 function buildInstalledTauYaml(input, env) {
@@ -2036,7 +2169,7 @@ function buildProvidersTauYaml(input) {
   const generatedAt = codegenTimestamp();
   const provenance = input.provenance ? input.provenance : "unknown";
   const lines = [
-    "# Code generated by @ranch/roost for Tau \u2014 DO NOT EDIT BY HAND.",
+    "# Code generated by @toxicwind/pinax for Tau \u2014 DO NOT EDIT BY HAND.",
     "# Regenerate with: bun run build  (in mesh/catalog)",
     "# Source of truth: mesh/catalog/src/data.ts",
     `# Generated at: ${generatedAt}`,
@@ -2093,11 +2226,16 @@ async function emitAll(outDir, input) {
   const goPath = join(outDir, "providers.go");
   const rustPath = join(outDir, "providers.rs");
   const tauPath = join(outDir, "tau-models.yml");
+  const kappaPath = join(outDir, "providers.kappa.json");
+  const kappaModelsPath = join(outDir, "kappa-models.json");
   await fs.writeFile(jsonPath, buildProvidersJson(input), "utf8");
   await fs.writeFile(goPath, buildProvidersGo(input), "utf8");
   await fs.writeFile(rustPath, buildProvidersRust(input), "utf8");
   await fs.writeFile(tauPath, buildProvidersTauYaml(input), "utf8");
-  return { jsonPath, goPath, rustPath, tauPath };
+  const kappaContent = buildProvidersKappaJson(input);
+  await fs.writeFile(kappaPath, kappaContent, "utf8");
+  await fs.writeFile(kappaModelsPath, kappaContent, "utf8");
+  return { jsonPath, goPath, rustPath, tauPath, kappaPath };
 }
 export {
   ADAPTERS,
@@ -2109,9 +2247,11 @@ export {
   PROVIDER_DEFS,
   PRUNE_AFTER_MISSES,
   adapterFor,
+  buildInstalledKappaJson,
   buildInstalledTauYaml,
   buildProvidersGo,
   buildProvidersJson,
+  buildProvidersKappaJson,
   buildProvidersRust,
   buildProvidersTauYaml,
   discover,
