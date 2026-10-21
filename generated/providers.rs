@@ -41,6 +41,8 @@ pub struct PinaxProvider {
     pub static_models: &'static [&'static str],
     /// Declared context windows per model ID (tokens). Absent = undeclared.
     pub context_lengths: &'static [(&'static str, u64)],
+    /// Maximum concurrent requests.
+    pub max_concurrency: u32,
 }
 
 /// The canonical provider table, generated from the Pinax catalog.
@@ -61,6 +63,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &["kimi-auto"],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "moonshot",
@@ -78,6 +81,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k", "kimi-k2-instruct"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "omniroute",
@@ -95,6 +99,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[("cohere/north-mini-code:free", 128000u64), ("google/gemma-4-26b-a4b-it:free", 1000000u64), ("google/gemma-4-31b-it:free", 1000000u64), ("inclusionai/ling-3.0-flash-fin:free", 256000u64), ("inclusionai/ling-3.0-flash:free", 256000u64), ("nvidia/nemotron-3-nano-30b-a3b:free", 256000u64), ("nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", 256000u64), ("nvidia/nemotron-3-super-120b-a12b:free", 500000u64), ("nvidia/nemotron-3-ultra-550b-a55b:free", 1000000u64), ("nvidia/nemotron-nano-12b-v2-vl:free", 256000u64), ("nvidia/nemotron-nano-9b-v2:free", 256000u64), ("poolside/laguna-s-2.1:free", 256000u64), ("poolside/laguna-xs-2.1:free", 256000u64)],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "nvidia",
@@ -112,6 +117,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[("deepseek-ai/deepseek-v4.1-flash", 256000u64), ("nvidia/nemotron-3-nano-omni-30b-a3b-reasoning", 256000u64), ("nvidia/nemotron-3-super-120b-a12b", 500000u64), ("nvidia/nemotron-3-ultra-550b-a55b", 1000000u64), ("openai/gpt-oss-20b", 128000u64), ("z-ai/glm-5.3", 200000u64), ("z-ai/glm-5.3-flash", 200000u64)],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "groq",
@@ -129,6 +135,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[("llama-3.3-70b-versatile", 128000u64), ("meta-llama/llama-4-scout-17b-16e-instruct", 1000000u64), ("openai/gpt-oss-120b", 128000u64), ("openai/gpt-oss-20b", 128000u64), ("qwen/qwen3-32b", 128000u64), ("qwen/qwen3.6-27b", 128000u64)],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "bitdeer",
@@ -146,6 +153,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "cerebras",
@@ -163,6 +171,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[("mistral-large-latest", 256000u64), ("mistral-medium-latest", 128000u64), ("mistral-small-latest", 128000u64)],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "openai",
@@ -180,6 +189,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[("claude-fable-5", 500000u64), ("claude-opus-4-5-20251101", 200000u64), ("claude-opus-5-5", 1000000u64), ("claude-sonnet-4-5-20250929", 200000u64), ("claude-sonnet-5", 1000000u64)],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "deepseek",
@@ -197,6 +207,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[("deepseek-v3.2-chat", 256000u64), ("deepseek-v4-flash", 256000u64), ("deepseek-v4-pro", 256000u64)],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "freeinference",
@@ -214,6 +225,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["glm-5.3-flash", "minimax-m3", "qwen3.6-35b", "diffusiongemma", "deepseek-v4-flash"],
         static_models: &[],
         context_lengths: &[("deepseek-v4-flash", 1000000u64), ("diffusiongemma", 262000u64), ("glm-5.3-flash", 1000000u64), ("minimax-m3", 1000000u64), ("qwen3.6-35b", 262000u64)],
+        max_concurrency: 2,
     },
     PinaxProvider {
         name: "wandb",
@@ -231,6 +243,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[("grok-4.5", 2000000u64), ("grok-4.6", 2000000u64)],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "together",
@@ -248,6 +261,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[("accounts/fireworks/models/glm-5.2-fast", 200000u64), ("kimi-k2.7-code", 256000u64)],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "deepinfra",
@@ -265,6 +279,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[("kimi-k2-thinking", 256000u64), ("kimi-k2.6", 256000u64), ("kimi-k2.7-code", 256000u64)],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "sambanova",
@@ -282,6 +297,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "siliconflow",
@@ -299,6 +315,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "novita",
@@ -316,6 +333,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "venice",
@@ -333,6 +351,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "aimlapi",
@@ -350,6 +369,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "baseten",
@@ -367,6 +387,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "zai",
@@ -384,6 +405,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "zen",
@@ -401,6 +423,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "synthetic",
@@ -418,6 +441,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "wafer-serverless",
@@ -435,6 +459,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "qianfan",
@@ -452,6 +477,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "gmi-cloud",
@@ -469,6 +495,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "sakana",
@@ -486,6 +513,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "abliteration",
@@ -503,6 +531,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "chutes",
@@ -520,6 +549,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "bedrock-mantle",
@@ -537,6 +567,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "ollama-cloud",
@@ -554,6 +585,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "cohere",
@@ -571,6 +603,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "commandcode",
@@ -588,6 +621,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "singularityapi-dev",
@@ -605,6 +639,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "hetzner",
@@ -622,6 +657,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[("hyperbolic/llama-3.1-70b", 128000u64)],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "google",
@@ -639,6 +675,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &[],
         static_models: &["models/gemini-flash-tool-retrieval", "models/gemini-3.8-flash", "models/gemini-3.7-flash", "models/gemini-3.6-flash", "models/gemini-3.5-flash", "models/gemini-3.1-pro-preview", "models/gemini-3-flash-preview", "models/gemini-2.5-flash"],
         context_lengths: &[("models/gemini-2.5-flash", 1000000u64), ("models/gemini-3-flash-preview", 1000000u64), ("models/gemini-3.1-pro-preview", 1000000u64), ("models/gemini-3.5-flash", 1000000u64), ("models/gemini-3.6-flash", 1000000u64), ("models/gemini-3.7-flash", 1000000u64), ("models/gemini-3.8-flash", 1000000u64), ("models/gemini-flash-tool-retrieval", 1000000u64)],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "github",
@@ -656,6 +693,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "parasail",
@@ -673,6 +711,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[("perplexity/sonar", 200000u64)],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "dashscope",
@@ -690,6 +729,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "sference",
@@ -707,6 +747,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "minara",
@@ -724,6 +765,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "cometapi",
@@ -741,6 +783,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "gpuai",
@@ -758,6 +801,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "inferbase",
@@ -775,6 +819,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "onde",
@@ -792,6 +837,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "inferen",
@@ -809,6 +855,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
     PinaxProvider {
         name: "inception",
@@ -826,6 +873,7 @@ pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
         seeds: &["google/diffusiongemma-26b-a4b-it", "meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-super-120b-a12b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-parse-2.0", "nvidia/riva-translate-4b-instruct-v1.1", "nvidia/riva-translate-4b-instruct-v2", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
         static_models: &[],
         context_lengths: &[],
+        max_concurrency: 0,
     },
 ];
 

@@ -68,6 +68,7 @@ providers:
   freeinference:
     baseUrl: https://freeinference.org/v1
     api: openai-completions
+    maxConcurrency: 2
     apiKey: FREEINFERENCE_API_KEY
     discovery:
       type: openai-models-list

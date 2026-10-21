@@ -361,6 +361,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
       "diffusiongemma": 262000,
       "deepseek-v4-flash": 1000000,
     },
+    maxConcurrency: 2,
   },
   {
     name: "wandb",

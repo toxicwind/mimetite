@@ -25,6 +25,7 @@ type CatalogProviderDef struct {
 	NoAuth         bool // auth === "none": no API key needed
 	RouterLocal    bool // TS-router-local concept; herd skips these
 	Enabled        bool
+	MaxConcurrency int // json:"maxConcurrency,omitempty"
 }
 
 // ProviderCatalogDefs is the canonical provider table.
@@ -43,6 +44,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         true,
 		RouterLocal:    true,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "moonshot",
@@ -58,6 +60,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "omniroute",
@@ -73,6 +76,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "nvidia",
@@ -88,6 +92,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "groq",
@@ -103,6 +108,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "bitdeer",
@@ -118,6 +124,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "cerebras",
@@ -133,6 +140,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "openai",
@@ -148,6 +156,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "deepseek",
@@ -163,6 +172,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "freeinference",
@@ -178,6 +188,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 2,
 	},
 	{
 		Name:           "wandb",
@@ -193,6 +204,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "together",
@@ -208,6 +220,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "deepinfra",
@@ -223,6 +236,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "sambanova",
@@ -238,6 +252,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "siliconflow",
@@ -253,6 +268,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "novita",
@@ -268,6 +284,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "venice",
@@ -283,6 +300,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "aimlapi",
@@ -298,6 +316,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "baseten",
@@ -313,6 +332,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "zai",
@@ -328,6 +348,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "zen",
@@ -343,6 +364,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "synthetic",
@@ -358,6 +380,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "wafer-serverless",
@@ -373,6 +396,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "qianfan",
@@ -388,6 +412,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "gmi-cloud",
@@ -403,6 +428,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "sakana",
@@ -418,6 +444,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "abliteration",
@@ -433,6 +460,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "chutes",
@@ -448,6 +476,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "bedrock-mantle",
@@ -463,6 +492,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "ollama-cloud",
@@ -478,6 +508,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "cohere",
@@ -493,6 +524,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "commandcode",
@@ -508,6 +540,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "singularityapi-dev",
@@ -523,6 +556,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "hetzner",
@@ -538,6 +572,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "google",
@@ -553,6 +588,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         true,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "github",
@@ -568,6 +604,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "parasail",
@@ -583,6 +620,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "dashscope",
@@ -598,6 +636,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "sference",
@@ -613,6 +652,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "minara",
@@ -628,6 +668,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "cometapi",
@@ -643,6 +684,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "gpuai",
@@ -658,6 +700,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "inferbase",
@@ -673,6 +716,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "onde",
@@ -688,6 +732,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "inferen",
@@ -703,6 +748,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 	{
 		Name:           "inception",
@@ -718,6 +764,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		NoAuth:         false,
 		RouterLocal:    false,
 		Enabled:        true,
+		MaxConcurrency: 0,
 	},
 }
 

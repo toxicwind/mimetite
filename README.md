@@ -17,6 +17,19 @@ estate estate:
 - **Auto-quarantine** — serve-time 404 or vanished-from-live-listing across
   2 consecutive successful refreshes → quarantined, never served, always
   observable. Re-listing re-admits automatically.
+- **Concurrency limits** — `ProviderDef.maxConcurrency` is propagated to all
+  generated artifacts (JSON, Go, Rust, Tau YAML, Kappa config). Consumers
+  use it to bound concurrent requests per provider (e.g. `freeinference: 2`).
+- **Tau integration** — `buildTauModelsYaml()` / `buildTauInstalledSlice()` /
+  `syncTauConfig()` in `src/integrations/tau.ts` emit the full Tau YAML
+  catalog and env-filtered installed slice to `~/.tau/models.yml` and the
+  estate config path. `createTauModelRegistryLoader()` provides a zero-dep
+  YAML loader for Tau consumers.
+- **Kappa integration** — `buildKappaProviderConfig()` /
+  `buildKappaInstalledJson()` / `buildKappaModelsDevJson()` /
+  `syncKappaConfig()` in `src/integrations/kappa.ts` emit `@ai-sdk/openai-compatible`
+  config blocks, installed JSON, and the dev `Record<string, Provider>`
+  cache format. Syncs to `~/.config/kappa/` and estate config.
 
 ## Why this exists
 
@@ -54,8 +67,14 @@ src/
   catalog.ts    ModelCatalog — serving sets, miss counters, quarantine, persistence,
                 live-catalog export (contract estate-pinax/live-catalog/v1)
   data.ts       THE source of truth: provider defs, seeds, aliases, dead ids
-  codegen.ts    emits generated/providers.json, providers.go, providers.rs, tau-models.yml, kappa-models.json
-scripts/build.ts  `bun run build` — regenerates generated/ and syncs installed slices to Tau and Kappa
+  codegen.ts        emits generated/providers.json, providers.go, providers.rs, tau-models.yml, kappa-models.json
+  integrations/
+    tau.ts          buildTauModelsYaml, buildTauInstalledSlice, syncTauConfig,
+                    createTauModelRegistryLoader (zero-dep, string-template YAML)
+    kappa.ts        buildKappaProviderConfig, buildKappaInstalledJson,
+                    buildKappaModelsDevJson, syncKappaConfig
+scripts/build.ts    `bun run build` — regenerates generated/ and syncs installed
+                    slices to Tau and Kappa via first-class integration modules
 generated/
   providers.json       canonical data artifact (Python consumers), $schema estate-pinax/v1
   providers.go         drop-in Go data file for herd (package astmatrix)
@@ -108,7 +127,7 @@ understands both the v2 shape and the legacy router
 ## Developing
 
 ```bash
-bun test          # 69 tests — adapters, catalog, codegen, concurrency, data
+bun test          # 103 tests — adapters, catalog, codegen, concurrency, data, tau/kappa integrations
 bun run build     # regenerate generated/ from src/data.ts
 ```
 

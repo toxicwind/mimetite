@@ -76,7 +76,7 @@ function goAliasMap(m: Record<string, ModelAlias>): string {
 /** Ordered key pool for a provider. keyEnv is first; keyEnvAlt may hold a
  *  comma-separated list of additional vars (the "N keys" model — the old
  *  two-key cap was an artifact of keyEnvAlt being a single scalar). */
-function keyEnvsOf(d: { keyEnv?: string; keyEnvAlt?: string }): string[] {
+export function keyEnvsOf(d: { keyEnv?: string; keyEnvAlt?: string }): string[] {
   const out: string[] = [];
   if (d.keyEnv) out.push(d.keyEnv);
   for (const v of (d.keyEnvAlt ?? "").split(",")) {
@@ -111,6 +111,7 @@ export function buildProvidersJson(input: CodegenInput): string {
       ...(d.noModelsReason ? { noModelsReason: d.noModelsReason } : {}),
       ...(d.enabled === false ? { enabled: false } : {}),
       ...(d.routerLocal ? { routerLocal: true } : {}),
+      ...(d.maxConcurrency !== undefined ? { maxConcurrency: d.maxConcurrency } : {}),
     })),
     // Seeds are cold-start data only; the JSON documents that contract.
     seeds: Object.fromEntries(input.defs.map((d) => [d.name, d.seeds])),
@@ -174,6 +175,7 @@ export function buildProvidersKappaJson(input: CodegenInput): string {
       options: {
         baseURL: d.baseUrl,
         apiKey,
+        ...(d.maxConcurrency !== undefined ? { maxConcurrency: d.maxConcurrency } : {}),
       },
       models,
     };
@@ -276,6 +278,7 @@ export function buildProvidersGo(input: CodegenInput): string {
         `\t\tNoAuth:         ${d.auth === "none" ? "true" : "false"},`,
         `\t\tRouterLocal:    ${d.routerLocal ? "true" : "false"},`,
         `\t\tEnabled:        ${d.enabled === false ? "false" : "true"},`,
+        `		MaxConcurrency: ${d.maxConcurrency ?? 0},`,
       ];
       return `\t{\n${fields.join("\n")}\n\t},`;
     })
@@ -324,6 +327,7 @@ type CatalogProviderDef struct {
 	NoAuth         bool // auth === "none": no API key needed
 	RouterLocal    bool // TS-router-local concept; herd skips these
 	Enabled        bool
+	MaxConcurrency int // json:"maxConcurrency,omitempty"
 }
 
 // ProviderCatalogDefs is the canonical provider table.
@@ -413,6 +417,7 @@ export function buildProvidersRust(input: CodegenInput): string {
         `seeds: ${rustStrSlice(d.seeds)},`,
         `static_models: ${rustStrSlice(d.staticModels ?? [])},`,
         `context_lengths: ${rustCtxLengths(d.contextLengths ?? {})},`,
+        `max_concurrency: ${d.maxConcurrency ?? 0},`,
       ];
       return `    PinaxProvider {\n${fields.map((f) => `        ${f}`).join("\n")}\n    },`;
     })
@@ -470,6 +475,8 @@ pub struct PinaxProvider {
     pub static_models: &'static [&'static str],
     /// Declared context windows per model ID (tokens). Absent = undeclared.
     pub context_lengths: &'static [(&'static str, u64)],
+    /// Maximum concurrent requests.
+    pub max_concurrency: u32,
 }
 
 /// The canonical provider table, generated from the Pinax catalog.
@@ -558,6 +565,9 @@ export function buildProvidersTauYaml(input: CodegenInput): string {
     lines.push(`  ${d.name}:`);
     lines.push(`    baseUrl: ${d.baseUrl}`);
     lines.push(`    api: openai-completions`);
+    if (d.maxConcurrency !== undefined) {
+      lines.push(`    maxConcurrency: ${d.maxConcurrency}`);
+    }
     if (d.auth === "none") {
       lines.push(`    auth: none`);
     } else if (d.keyEnv) {

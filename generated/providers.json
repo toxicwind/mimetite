@@ -121,7 +121,8 @@
         "FREEINFERENCE_API_KEY"
       ],
       "adapter": "openai",
-      "auth": "bearer"
+      "auth": "bearer",
+      "maxConcurrency": 2
     },
     {
       "name": "wandb",
