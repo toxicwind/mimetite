@@ -28,6 +28,19 @@ const outDir = join(here, "..", "generated");
 const FLOCK_RUST_PATHS = [
   resolve(here, "..", "..", "hodos", "proxy", "src", "roost_providers.rs"),
   resolve(here, "..", "..", "hodos", "proxy", "src", "pinax_providers.rs"),
+  // forge/router/flock-proxy is a second Rust flock-proxy copy (tracked in the
+  // forge repo). Its own copy-in-sync gate is fixed in the same rename; keep it
+  // emitted by this build so it can't silently drift again.
+  resolve(
+    here,
+    "..",
+    "..",
+    "forge",
+    "router",
+    "flock-proxy",
+    "src",
+    "roost_providers.rs",
+  ),
 ];
 
 // Deterministic generatedAt: pin SOURCE_DATE_EPOCH to the last commit touching
