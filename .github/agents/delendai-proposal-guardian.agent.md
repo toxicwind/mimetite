@@ -1,7 +1,7 @@
 ---
 name: delendai-proposal-guardian
 description: Proposal hygiene and planning
-tools: [read, search, edit, execute, todo, DelendAI:estate-pinax/*]
+tools: [read, search, edit, execute, todo, DelendAI:estate-mimetite/*]
 user-invocable: false
 ---
 

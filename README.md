@@ -1,4 +1,4 @@
-# 🪹 pinax — `@toxicwind/pinax`
+# 🪹 mimetite — `@toxicwind/mimetite`
 
 **Master provider catalog for the estate.** One source of truth for every LLM
 provider's wire facts (base URL, key env var, endpoint-shape adapter, seeds,
@@ -7,7 +7,7 @@ serving set** every router and agent perches on. TS consumers import the
 package; Go/Rust/Python/Tau/Kappa consumers read **generated artifacts**, never
 hand-maintained copies.
 
-> Every flock comes home to pinax — where the birds settle, perch, and rest.
+> Every flock comes home to mimetite — where the birds settle, perch, and rest.
 
 ## What it is
 
@@ -28,12 +28,12 @@ hand-maintained copies.
 
 Every consumer used to hand-maintain its own provider→model list. Live discovery
 could only *add* — nothing ever removed a dead id. Result: 4 of 6 groq ids
-404'd in production until a human noticed. Pinax makes the **live listing the
-source of truth** and demotes curation to cold-start seeds. One pinax; nobody
+404'd in production until a human noticed. Mimetite makes the **live listing the
+source of truth** and demotes curation to cold-start seeds. One mimetite; nobody
 keeps a private nest. When a provider kills a model, the whole estate learns
 within two refreshes — no human in the loop.
 
-The rule: **if it names a provider or a model id, it reads the pinax.**
+The rule: **if it names a provider or a model id, it reads the mimetite.**
 Hand-maintained provider/model inventories are a bug — file it as one.
 
 ## The serving contract
@@ -76,7 +76,7 @@ src/
   adapters.ts   one parser per /models wire shape (openai, google-v1beta, mistral, static, none)
   discovery.ts  fetch + parse with timeout; failures never cached, never acted on
   catalog.ts    ModelCatalog — serving sets, miss/prune, quarantine, overlays,
-                live-catalog export (contract estate-pinax/live-catalog/v1)
+                live-catalog export (contract estate-mimetite/live-catalog/v1)
   data.ts       THE source of truth: provider defs, seeds, aliases, dead ids
   codegen.ts    emits generated/providers.{json,go,rs}, tau-models.yml, kappa-models.json
   auto-loader.ts  providers.d/ drop-in merger + auto-synthesis for uncovered ids
@@ -84,7 +84,7 @@ src/
 providers.d/    drop-in `*.json` provider definitions (no data.ts edit required)
 scripts/build.ts  `bun run build` — regenerates generated/ + syncs installed slices
 generated/
-  providers.json       canonical JSON artifact (Python consumers), $schema estate-pinax/v1
+  providers.json       canonical JSON artifact (Python consumers), $schema estate-mimetite/v1
   providers.go         drop-in Go data file for herd (package astmatrix)
   providers.rs         drop-in Rust data module for flock (PINAX_* constants)
   tau-models.yml       canonical YAML model catalog for Tau
@@ -185,7 +185,7 @@ persisted serving array can never resurrect a dead id (serving is re-derived
 from loaded live + miss tolerance + quarantine + dead list).
 
 The **live-catalog export** (`{state}.live.json`, contract
-`estate-pinax/live-catalog/v1`) is pure data: derived serving sets, quarantine
+`estate-mimetite/live-catalog/v1`) is pure data: derived serving sets, quarantine
 lists, discovery flags. Non-TS consumers read it verbatim; membership logic
 lives only in the TS package.
 
@@ -198,7 +198,7 @@ touching `src/data.ts`), so stale-artifact drift is a test failure, and the Floc
 Rust consumer copy is written from a single render — no hand-copy drift.
 
 `build.ts` also syncs the Flock Rust data module to
-`../hodos/proxy/src/{roost,pinax}_providers.rs` and the Flock-proxy copy, and
+`../hodos/proxy/src/{roost,mimetite}_providers.rs` and the Flock-proxy copy, and
 best-effort syncs `~/.tau/models.yml` / `~/.config/kappa/kappa-models.json` /
 their estate mirrors (skipped gracefully when the estate paths don't exist).
 
@@ -218,10 +218,10 @@ bun test`) through mise; eligible task artifacts restore through mbx-cache.
 | Consumer | How it consumes | Status |
 |---|---|---|
 | **tau** (`toxicwind/tau`) | reads `tau-models.yml` | provider authority for the coding-agent engine |
-| **herd** (Go) | `internal/astmatrix/providers.go` — generated, checked in, never hand-edited; reads the live-catalog export for live sets | Provenance `@toxicwind/pinax` |
+| **herd** (Go) | `internal/astmatrix/providers.go` — generated, checked in, never hand-edited; reads the live-catalog export for live sets | Provenance `@toxicwind/mimetite` |
 | **flock** (Rust) | `proxy/src/pinax_providers.rs` — generated data module, synced by build | wire data only; flock keeps its operational overlay |
 | **kappa** (Go+TS) | `generated/kappa-models.json` (full) + installed slice | two profiles: canonical catalog + env-filtered live config |
-| **Python research scripts** | `generated/providers.json` (canonical) + `*.live.json` (derived) | stable schemas `estate-pinax/v1` / `live-catalog/v1` |
+| **Python research scripts** | `generated/providers.json` (canonical) + `*.live.json` (derived) | stable schemas `estate-mimetite/v1` / `live-catalog/v1` |
 
 ## Research & deep-dives
 

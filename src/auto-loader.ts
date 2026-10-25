@@ -1,10 +1,10 @@
 /**
- * Auto provider-defs loader — first-class drift killer for @toxicwind/pinax.
+ * Auto provider-defs loader — first-class drift killer for @toxicwind/mimetite.
  *
  * The static PROVIDER_DEFS in data.ts is curated by hand. Policy layers
  * (tau's TAU_PROVIDER_POLICY, herd fragments, pitchfork configs) can name
  * providers the static catalog doesn't know yet. Previously that produced a
- * `[pinax] DRIFT` skip-warning and required a hand edit to data.ts for every
+ * `[mimetite] DRIFT` skip-warning and required a hand edit to data.ts for every
  * new provider. This loader closes that loop:
  *
  *   1. static defs win — curated entries are never overwritten;
@@ -103,7 +103,7 @@ export function loadProviderDefs(
   const synthesized: string[] = [];
   const endpoints = { ...KNOWN_ENDPOINTS, ...(opts.endpoints ?? {}) };
   const notify = opts.onSynthesize ?? ((id, def) => console.warn(
-    `[pinax] provider "${id}" has no curated PROVIDER_DEFS entry — ` +
+    `[mimetite] provider "${id}" has no curated PROVIDER_DEFS entry — ` +
     `auto-synthesized best-effort def (keyEnv ${def.keyEnv}). ` +
     `Promote it to estate/mesh/catalog/src/data.ts to silence this.`,
   ));

@@ -1,4 +1,4 @@
-// @pinax — provider -> modelProvider -> model hierarchy (TDD contract).
+// @mimetite — provider -> modelProvider -> model hierarchy (TDD contract).
 // A provider may own 1..N modelProviders (distinct serving backends). The SAME
 // model id in two modelProviders is a VALID dupe — never deduped, tagged by
 // modelProvider path. Legacy providers without modelProviders (flat) are

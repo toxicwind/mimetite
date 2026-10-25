@@ -1,7 +1,7 @@
 ---
 name: delendai-delivery-verifier
 description: Acceptance and gates verifier
-tools: [read, search, edit, execute, todo, DelendAI:estate-pinax/*]
+tools: [read, search, edit, execute, todo, DelendAI:estate-mimetite/*]
 user-invocable: false
 ---
 

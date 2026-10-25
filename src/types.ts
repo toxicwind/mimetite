@@ -175,11 +175,11 @@ export interface PersistedCatalog {
 /**
  * Live catalog export — the ANSWER for non-TS consumers (Go herd, Python).
  * Pure data: derived serving sets, quarantine lists, discovery flags.
- * Contract: estate-pinax/live-catalog/v1. Consumers read the serving
+ * Contract: estate-mimetite/live-catalog/v1. Consumers read the serving
  * arrays verbatim; membership logic lives only in the TS package.
  */
 export interface LiveCatalogJson {
-  contract: "estate-pinax/live-catalog/v1";
+  contract: "estate-mimetite/live-catalog/v1";
   generatedAt: string;
   generator: string;
   deadIds: string[];

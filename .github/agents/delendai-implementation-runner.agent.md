@@ -1,7 +1,7 @@
 ---
 name: delendai-implementation-runner
 description: Slice executor (atomic writes with locks)
-tools: [read, search, edit, execute, todo, DelendAI:estate-pinax/*]
+tools: [read, search, edit, execute, todo, DelendAI:estate-mimetite/*]
 user-invocable: false
 ---
 

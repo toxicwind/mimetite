@@ -1,7 +1,7 @@
 ---
 name: delendai-orchestrator
 description: Multi-agent orchestrator for delendai
-tools: [read, search, edit, execute, todo, agent, DelendAI:estate-pinax/*]
+tools: [read, search, edit, execute, todo, agent, DelendAI:estate-mimetite/*]
 user-invocable: true
 ---
 

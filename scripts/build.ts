@@ -65,7 +65,7 @@ const { jsonPath, goPath, rustPath, tauPath, kappaPath } = await emitAll(
     defs: PROVIDER_DEFS,
     aliases: MODEL_ALIASES,
     deadIds: DEAD_MODEL_IDS,
-    provenance: "@toxicwind/pinax src/data.ts",
+    provenance: "@toxicwind/mimetite src/data.ts",
   },
 );
 
@@ -120,7 +120,7 @@ const installed = buildInstalledTauYaml(
     defs: PROVIDER_DEFS,
     aliases: MODEL_ALIASES,
     deadIds: DEAD_MODEL_IDS,
-    provenance: "@toxicwind/pinax src/data.ts",
+    provenance: "@toxicwind/mimetite src/data.ts",
   },
   installedEnv,
 );
@@ -147,7 +147,7 @@ const kappaInstalled = buildInstalledKappaJson(
     defs: PROVIDER_DEFS,
     aliases: MODEL_ALIASES,
     deadIds: DEAD_MODEL_IDS,
-    provenance: "@toxicwind/pinax src/data.ts",
+    provenance: "@toxicwind/mimetite src/data.ts",
   },
   installedEnv,
 );

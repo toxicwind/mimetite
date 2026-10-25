@@ -18,7 +18,7 @@ const readme = join(here, "..", "README.md");
 
 describe("README facts block", () => {
   test("checked-in FACTS block matches a fresh generation (run `bun run facts`)", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "pinax-facts-"));
+    const dir = await mkdtemp(join(tmpdir(), "mimetite-facts-"));
     try {
       // Copy README into a temp dir and let syncFacts rewrite it there.
       const tmpReadme = join(dir, "README.md");

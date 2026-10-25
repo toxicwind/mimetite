@@ -1,6 +1,6 @@
 {
 	"mcpServers": {
-		"DelendAI:estate-pinax": {
+		"DelendAI:estate-mimetite": {
 			"type": "stdio",
 			"command": "bunx",
 			"args": [
@@ -11,7 +11,7 @@
 				"--workspace",
 				".",
 				"--name",
-				"DelendAI:estate-pinax"
+				"DelendAI:estate-mimetite"
 			]
 		}
 	}

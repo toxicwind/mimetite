@@ -1,8 +1,8 @@
 {
   "$schema": "https://app.kappa.ai/config.json",
-  "contract": "estate-pinax/kappa-catalog/v1",
-  "generator": "@toxicwind/pinax codegen — kappa target (full profile) — DO NOT EDIT BY HAND",
-  "provenance": "@toxicwind/pinax src/data.ts",
+  "contract": "estate-mimetite/kappa-catalog/v1",
+  "generator": "@toxicwind/mimetite codegen — kappa target (full profile) — DO NOT EDIT BY HAND",
+  "provenance": "@toxicwind/mimetite src/data.ts",
   "generatedAt": "2026-10-25T05:46:49.000Z",
   "deadIds": [
     "llama-3.3-70b-versatile",

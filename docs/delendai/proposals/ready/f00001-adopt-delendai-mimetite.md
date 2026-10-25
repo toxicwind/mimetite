@@ -5,7 +5,7 @@ type: proposal
 track: adoption-migration
 date: 2026-10-21
 kind: feat
-title: Adopt delendai workflow (pinax)
+title: Adopt delendai workflow (mimetite)
 shipped-in: []
 recan: []
 related:
@@ -21,7 +21,7 @@ acceptance:
     - { command: bun run validate, expect: exit0 }
 ---
 
-# f00001 — Adopt delendai (pinax)
+# f00001 — Adopt delendai (mimetite)
 
 ## goal
 
