@@ -622,7 +622,6 @@ export function buildProvidersTauYaml(input: CodegenInput): string {
     if (
       d.enabled === false ||
       d.routerLocal ||
-      d.name === "herd" ||
       d.name === "herd"
     ) {
       continue;
