@@ -104,11 +104,11 @@ tests/          tests — adapters, catalog, codegen, concurrency, auto-loader, 
 | provider defs | 47 |
 | enabled providers | 47 |
 | modelProvider carriers | 1 (hodos) |
-| serving backends | 3 modelProviders, 49 distinct serve-paths |
+| serving backends | 2 modelProviders, 48 distinct serve-paths |
 | model aliases | 24 |
 | dead model ids | 16 |
 | endpoint adapters | 5 (openai, mistral, google-v1beta, static, none) |
-| tests | 89 across tests/*.test.ts |
+| tests | 98 across tests/*.test.ts |
 
 <!-- FACTS:END -->
 

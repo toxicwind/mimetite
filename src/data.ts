@@ -114,48 +114,20 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     ],
   },
   {
-    name: "omniroute",
-    displayName: "OmniRoute (local gateway)",
-    // 2026-10-09: :20130 is OmniRoute (config/ports.env OMNIROUTE_PORT) --
-    // the multi-provider aggregator with its own dashboard at
-    // https://estate.tailc9ac71.ts.net:8443. Distinct from VansRouter (:20128);
-    // both are registered so neither shadows the other. Gateway auth uses a
-    // key minted in the dashboard (API Keys -> estate-gateway), not the
-    // per-provider upstream keys that live inside its DB.
-    baseUrl: "http://127.0.0.1:20130/v1",
-    keyEnv: "OMNIROUTE_GATEWAY_KEY",
-    auth: "bearer",
+    name: "bornite",
+    displayName: "Bornite (local VRAM engine)",
+    // :25100 is the estate's LOCAL inference engine (was `herd`): it serves
+    // the on-box GGUF fleet over an OpenAI-compatible surface and is the
+    // sovereign leg of the routing chain (chalcopyrite :25200 ->
+    // rhodochrosite :25193 -> bornite :25100). It was ABSENT from this
+    // catalog until 2026-10-25, so the estate's own live local models were
+    // invisible to every consumer that reads the catalog.
+    // `auth: none` — the local engine is bound to loopback and does not gate.
+    baseUrl: "http://127.0.0.1:25100/v1",
+    keyEnv: "",
+    auth: "none",
     adapter: "openai",
-    seeds: [
-      "google/diffusiongemma-26b-a4b-it",
-      "meta/llama-3.2-11b-vision-instruct",
-      "meta/muse-glimmer-30b",
-      "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
-      "nvidia/nemotron-3.5-content-safety",
-      "nvidia/nemotron-3.5-lightning-30b-a3b",
-      "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
-      "openai/gpt-oss-20b",
-      "poolside/laguna-xs-2.1",
-      "z-ai/glm-5.3-flash",
-    ],
-    contextLengths: {
-      "cohere/north-mini-code:free": 128000,
-      "google/gemma-4-26b-a4b-it:free": 1000000,
-      "google/gemma-4-31b-it:free": 1000000,
-      "inclusionai/ling-3.0-flash-fin:free": 256000,
-      "inclusionai/ling-3.0-flash:free": 256000,
-      "nvidia/nemotron-3-nano-30b-a3b:free": 256000,
-      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 256000,
-      "nvidia/nemotron-3-super-120b-a12b:free": 500000,
-      "nvidia/nemotron-3-ultra-550b-a55b:free": 1000000,
-      "nvidia/nemotron-nano-12b-v2-vl:free": 256000,
-      "nvidia/nemotron-nano-9b-v2:free": 256000,
-      "poolside/laguna-s-2.1:free": 256000,
-      "poolside/laguna-xs-2.1:free": 256000,
-    },
+    seeds: [],
   },
   {
     name: "hodos",
@@ -172,25 +144,6 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     adapter: "none", // gateway itself has no single /models; modelProviders own the surfaces
     seeds: [],
     modelProviders: [
-      {
-        name: "flock",
-        displayName: "Flock (hodos :25193)",
-        baseUrl: "http://127.0.0.1:25193/v1",
-        keyEnv: "HODOS_API_KEY",
-        auth: "bearer",
-        adapter: "openai",
-        seeds: [
-          "nvidia/nemotron-3.5-super-vl-120b-a12b",
-          "nvidia/nemotron-3.5-lightning-30b-a3b",
-          "nvidia/nemotron-3-super-120b-a12b",
-          "meta/llama-3.2-11b-vision-instruct",
-          "google/diffusiongemma-26b-a4b-it",
-        ],
-        contextLengths: {
-          "nvidia/nemotron-3.5-super-vl-120b-a12b": 128000,
-          "nvidia/nemotron-3.5-lightning-30b-a3b": 128000,
-        },
-      },
       {
         name: "cuttinggate",
         displayName: "CuttingGate :25200",
