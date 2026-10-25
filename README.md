@@ -17,19 +17,6 @@ estate estate:
 - **Auto-quarantine** — serve-time 404 or vanished-from-live-listing across
   2 consecutive successful refreshes → quarantined, never served, always
   observable. Re-listing re-admits automatically.
-- **Concurrency limits** — `ProviderDef.maxConcurrency` is propagated to all
-  generated artifacts (JSON, Go, Rust, Tau YAML, Kappa config). Consumers
-  use it to bound concurrent requests per provider (e.g. `freeinference: 2`).
-- **Tau integration** — `buildTauModelsYaml()` / `buildTauInstalledSlice()` /
-  `syncTauConfig()` in `src/integrations/tau.ts` emit the full Tau YAML
-  catalog and env-filtered installed slice to `~/.tau/models.yml` and the
-  estate config path. `createTauModelRegistryLoader()` provides a zero-dep
-  YAML loader for Tau consumers.
-- **Kappa integration** — `buildKappaProviderConfig()` /
-  `buildKappaInstalledJson()` / `buildKappaModelsDevJson()` /
-  `syncKappaConfig()` in `src/integrations/kappa.ts` emit `@ai-sdk/openai-compatible`
-  config blocks, installed JSON, and the dev `Record<string, Provider>`
-  cache format. Syncs to `~/.config/kappa/` and estate config.
 
 ## Why this exists
 
@@ -67,14 +54,8 @@ src/
   catalog.ts    ModelCatalog — serving sets, miss counters, quarantine, persistence,
                 live-catalog export (contract estate-pinax/live-catalog/v1)
   data.ts       THE source of truth: provider defs, seeds, aliases, dead ids
-  codegen.ts        emits generated/providers.json, providers.go, providers.rs, tau-models.yml, kappa-models.json
-  integrations/
-    tau.ts          buildTauModelsYaml, buildTauInstalledSlice, syncTauConfig,
-                    createTauModelRegistryLoader (zero-dep, string-template YAML)
-    kappa.ts        buildKappaProviderConfig, buildKappaInstalledJson,
-                    buildKappaModelsDevJson, syncKappaConfig
-scripts/build.ts    `bun run build` — regenerates generated/ and syncs installed
-                    slices to Tau and Kappa via first-class integration modules
+  codegen.ts    emits generated/providers.json, providers.go, providers.rs, tau-models.yml, kappa-models.json
+scripts/build.ts  `bun run build` — regenerates generated/ and syncs installed slices to Tau and Kappa
 generated/
   providers.json       canonical data artifact (Python consumers), $schema estate-pinax/v1
   providers.go         drop-in Go data file for herd (package astmatrix)
@@ -127,7 +108,7 @@ understands both the v2 shape and the legacy router
 ## Developing
 
 ```bash
-bun test          # 103 tests — adapters, catalog, codegen, concurrency, data, tau/kappa integrations
+bun test          # 69 tests — adapters, catalog, codegen, concurrency, data
 bun run build     # regenerate generated/ from src/data.ts
 ```
 
@@ -142,3 +123,24 @@ build+test (`bun run build && bun test`) directly through mise. Eligible task ar
 ```sh
 ./scripts/mise-build.sh
 ```
+
+## provider → modelProvider → model (first-class hierarchy)
+
+A top-level **provider** (hodos, freeinference, google, groq) is a vendor or
+gateway. It can serve a model set through **one or more distinct serving
+backends** — a **modelProvider** (e.g. hodos owns `flock` :25193,
+`cuttinggate` :25200, `secure-nim`). Each modelProvider carries its own
+`baseUrl`/`keyEnv`/`adapter` and its own model list.
+
+- **Dupes are VALID.** The same model id in two modelProviders is *not*
+  deduped; it is disambiguated by the path `provider.modelProvider.model`
+  (e.g. `hodos.flock` vs `hodos.cuttinggate` both serve
+  `nvidia/nemotron-3.5-super-vl-120b-a12b`).
+- `ProviderDef.modelProviders` (optional) when present supersedes the legacy
+  flat `baseUrl`. Legacy providers without it resolve at the implicit
+  `modelProvider = ""` (unchanged behavior).
+- Generated artifacts expose the layer: `providers.json` lists `modelProviders`;
+  kappa gets disambiguated provider-map keys (`hodos.flock`, ...); tau models.yml
+  and herd/flock `providers.go`/`providers.rs` carry the hodos def.
+- Resolver: `ModelCatalog.allServingByModelProvider()` returns every
+  `{ provider, modelProvider, id, source }` row, dupes intact.

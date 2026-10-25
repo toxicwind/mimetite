@@ -51,20 +51,5 @@ export {
   buildProvidersRust,
   buildProvidersTauYaml,
   emitAll,
-  keyEnvsOf,
 } from "./codegen.ts";
 export type { CodegenInput } from "./codegen.ts";
-export {
-  buildTauModelsYaml,
-  buildTauInstalledSlice,
-  syncTauConfig,
-  createTauModelRegistryLoader,
-} from "./integrations/tau.ts";
-
-export {
-  buildKappaProviderConfig,
-  buildKappaInstalledJson,
-  buildKappaModelsDevJson,
-  syncKappaConfig,
-} from "./integrations/kappa.ts";
-

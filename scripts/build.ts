@@ -8,8 +8,6 @@
  */
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { syncTauConfig } from "../src/integrations/tau.ts";
-import { syncKappaConfig } from "../src/integrations/kappa.ts";
 import {
   buildInstalledKappaJson,
   buildInstalledTauYaml,
@@ -28,6 +26,7 @@ const outDir = join(here, "..", "generated");
  * filesystem (hodos is its own repo), so a relative path reaches it.
  */
 const FLOCK_RUST_PATHS = [
+  resolve(here, "..", "..", "hodos", "proxy", "src", "roost_providers.rs"),
   resolve(here, "..", "..", "hodos", "proxy", "src", "pinax_providers.rs"),
   // forge/router/flock-proxy is a second Rust flock-proxy copy (tracked in the
   // forge repo). Its own copy-in-sync gate is fixed in the same rename; keep it
@@ -40,7 +39,7 @@ const FLOCK_RUST_PATHS = [
     "router",
     "flock-proxy",
     "src",
-    "pinax_providers.rs",
+    "roost_providers.rs",
   ),
 ];
 
@@ -142,22 +141,6 @@ for (const p of [
 console.log(
   "synced installed slice to ~/.tau/models.yml and estate/config/tau/models.yml",
 );
-
-// First-class Tau integration sync (maxConcurrency-aware).
-try {
-  const tauPaths = await syncTauConfig({});
-  console.log("tau integration: synced to " + tauPaths.join(", "));
-} catch (e) {
-  console.warn("tau integration sync failed: " + (e as Error).message);
-}
-
-// First-class Kappa integration sync (maxConcurrency-aware).
-try {
-  const kappaPaths = await syncKappaConfig({});
-  console.log("kappa integration: synced to " + kappaPaths.join(", "));
-} catch (e) {
-  console.warn("kappa integration sync failed: " + (e as Error).message);
-}
 
 const kappaInstalled = buildInstalledKappaJson(
   {

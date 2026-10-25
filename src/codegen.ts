@@ -76,7 +76,7 @@ function goAliasMap(m: Record<string, ModelAlias>): string {
 /** Ordered key pool for a provider. keyEnv is first; keyEnvAlt may hold a
  *  comma-separated list of additional vars (the "N keys" model — the old
  *  two-key cap was an artifact of keyEnvAlt being a single scalar). */
-export function keyEnvsOf(d: { keyEnv?: string; keyEnvAlt?: string }): string[] {
+function keyEnvsOf(d: { keyEnv?: string; keyEnvAlt?: string }): string[] {
   const out: string[] = [];
   if (d.keyEnv) out.push(d.keyEnv);
   for (const v of (d.keyEnvAlt ?? "").split(",")) {
@@ -84,6 +84,31 @@ export function keyEnvsOf(d: { keyEnv?: string; keyEnvAlt?: string }): string[] 
     if (t) out.push(t);
   }
   return out;
+}
+
+/** Serialize one ModelProviderDef into the JSON artifact (never duplicates by sibling). */
+function modelProviderJson(mp: {
+  name: string;
+  baseUrl: string;
+  keyEnv?: string;
+  adapter?: string;
+  auth?: string;
+  headerName?: string;
+  queryParam?: string;
+  seeds?: string[];
+  contextLengths?: Record<string, number>;
+}) {
+  return {
+    name: mp.name,
+    baseUrl: mp.baseUrl,
+    ...(mp.keyEnv ? { keyEnv: mp.keyEnv } : {}),
+    ...(mp.adapter ? { adapter: mp.adapter } : {}),
+    ...(mp.auth ? { auth: mp.auth } : {}),
+    ...(mp.headerName ? { headerName: mp.headerName } : {}),
+    ...(mp.queryParam ? { queryParam: mp.queryParam } : {}),
+    ...(mp.seeds ? { seeds: mp.seeds } : {}),
+    ...(mp.contextLengths ? { contextLengths: mp.contextLengths } : {}),
+  };
 }
 
 /** Canonical JSON artifact for non-TS consumers (Python research scripts). */
@@ -111,7 +136,11 @@ export function buildProvidersJson(input: CodegenInput): string {
       ...(d.noModelsReason ? { noModelsReason: d.noModelsReason } : {}),
       ...(d.enabled === false ? { enabled: false } : {}),
       ...(d.routerLocal ? { routerLocal: true } : {}),
-      ...(d.maxConcurrency !== undefined ? { maxConcurrency: d.maxConcurrency } : {}),
+      ...(d.modelProviders
+        ? {
+            modelProviders: d.modelProviders.map((mp) => modelProviderJson(mp)),
+          }
+        : {}),
     })),
     // Seeds are cold-start data only; the JSON documents that contract.
     seeds: Object.fromEntries(input.defs.map((d) => [d.name, d.seeds])),
@@ -175,10 +204,46 @@ export function buildProvidersKappaJson(input: CodegenInput): string {
       options: {
         baseURL: d.baseUrl,
         apiKey,
-        ...(d.maxConcurrency !== undefined ? { maxConcurrency: d.maxConcurrency } : {}),
       },
       models,
     };
+
+    // MODEL-PROVIDER LAYER: a provider with modelProviders exposes each
+    // distinct serving backend as its own kappa provider keyed
+    // `provider.modelProvider` (e.g. "hodos.flock", "hodos.secure-nim").
+    // The same model id in two modelProviders is a VALID dupe — both entries
+    // are emitted, each with its own baseURL/keyEnv. Never deduped.
+    if (d.modelProviders && d.modelProviders.length > 0) {
+      for (const mp of d.modelProviders) {
+        const mpModels: Record<
+          string,
+          { name: string; limit: { context: number; output: number } }
+        > = {};
+        const mpIds = mp.seeds ?? [];
+        for (const id of mpIds) {
+          mpModels[id] = {
+            name: id,
+            limit: {
+              context:
+                mp.contextLengths?.[id] ?? d.contextLengths?.[id] ?? 128000,
+              output: 8192,
+            },
+          };
+        }
+        let mpKey = "none";
+        if (mp.keyEnv) mpKey = `{env:${mp.keyEnv}}`;
+        const mpKeyName = `${d.name}.${mp.name}`;
+        providerMap[mpKeyName] = {
+          npm: "@ai-sdk/openai-compatible",
+          name: `${d.displayName ?? d.name} / ${mp.displayName ?? mp.name}`,
+          options: {
+            baseURL: mp.baseUrl,
+            apiKey: mpKey,
+          },
+          models: mpModels,
+        };
+      }
+    }
   }
 
   const doc = {
@@ -209,6 +274,11 @@ export function buildProvidersKappaJson(input: CodegenInput): string {
       ...(d.noModelsReason ? { noModelsReason: d.noModelsReason } : {}),
       ...(d.enabled === false ? { enabled: false } : {}),
       ...(d.routerLocal ? { routerLocal: true } : {}),
+      ...(d.modelProviders
+        ? {
+            modelProviders: d.modelProviders.map((mp) => modelProviderJson(mp)),
+          }
+        : {}),
     })),
   };
 
@@ -278,7 +348,6 @@ export function buildProvidersGo(input: CodegenInput): string {
         `\t\tNoAuth:         ${d.auth === "none" ? "true" : "false"},`,
         `\t\tRouterLocal:    ${d.routerLocal ? "true" : "false"},`,
         `\t\tEnabled:        ${d.enabled === false ? "false" : "true"},`,
-        `		MaxConcurrency: ${d.maxConcurrency ?? 0},`,
       ];
       return `\t{\n${fields.join("\n")}\n\t},`;
     })
@@ -327,7 +396,6 @@ type CatalogProviderDef struct {
 	NoAuth         bool // auth === "none": no API key needed
 	RouterLocal    bool // TS-router-local concept; herd skips these
 	Enabled        bool
-	MaxConcurrency int // json:"maxConcurrency,omitempty"
 }
 
 // ProviderCatalogDefs is the canonical provider table.
@@ -417,7 +485,6 @@ export function buildProvidersRust(input: CodegenInput): string {
         `seeds: ${rustStrSlice(d.seeds)},`,
         `static_models: ${rustStrSlice(d.staticModels ?? [])},`,
         `context_lengths: ${rustCtxLengths(d.contextLengths ?? {})},`,
-        `max_concurrency: ${d.maxConcurrency ?? 0},`,
       ];
       return `    PinaxProvider {\n${fields.map((f) => `        ${f}`).join("\n")}\n    },`;
     })
@@ -475,8 +542,6 @@ pub struct PinaxProvider {
     pub static_models: &'static [&'static str],
     /// Declared context windows per model ID (tokens). Absent = undeclared.
     pub context_lengths: &'static [(&'static str, u64)],
-    /// Maximum concurrent requests.
-    pub max_concurrency: u32,
 }
 
 /// The canonical provider table, generated from the Pinax catalog.
@@ -565,9 +630,6 @@ export function buildProvidersTauYaml(input: CodegenInput): string {
     lines.push(`  ${d.name}:`);
     lines.push(`    baseUrl: ${d.baseUrl}`);
     lines.push(`    api: openai-completions`);
-    if (d.maxConcurrency !== undefined) {
-      lines.push(`    maxConcurrency: ${d.maxConcurrency}`);
-    }
     if (d.auth === "none") {
       lines.push(`    auth: none`);
     } else if (d.keyEnv) {
