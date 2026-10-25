@@ -2321,7 +2321,7 @@ function buildProvidersTauYaml(input) {
     "      type: openai-models-list"
   ];
   for (const d of input.defs) {
-    if (d.enabled === false || d.routerLocal || d.name === "herd" || d.name === "herd") {
+    if (d.enabled === false || d.routerLocal || d.name === "herd") {
       continue;
     }
     lines.push(`  ${d.name}:`);

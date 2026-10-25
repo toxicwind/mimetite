@@ -1,6 +1,6 @@
 {
   "$schema": "estate-pinax/v1",
-  "generatedAt": "2026-10-21T06:25:05.000Z",
+  "generatedAt": "2026-10-25T05:46:49.000Z",
   "generator": "@toxicwind/pinax codegen — DO NOT EDIT BY HAND",
   "provenance": "@toxicwind/pinax src/data.ts",
   "adapters": [
