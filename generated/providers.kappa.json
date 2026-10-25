@@ -3,7 +3,7 @@
   "contract": "estate-mimetite/kappa-catalog/v1",
   "generator": "@toxicwind/mimetite codegen — kappa target (full profile) — DO NOT EDIT BY HAND",
   "provenance": "@toxicwind/mimetite src/data.ts",
-  "generatedAt": "2026-10-25T05:46:49.000Z",
+  "generatedAt": "2026-10-25T21:56:02.000Z",
   "deadIds": [
     "llama-3.3-70b-versatile",
     "meta-llama/llama-3.1-8b-instruct",
