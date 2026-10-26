@@ -133,7 +133,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     name: "rhodochrosite",
     displayName: "Rhodochrosite (estate multi-provider gateway)",
     // rhodochrosite :25193 is the estate's multi-provider inference gateway
-    // (pens/olympus/products/rhodochrosite, "flock" circuit). It is the FIRST-CLASS
+    // (pens/geode/products/rhodochrosite, "flock" circuit). It is the FIRST-CLASS
     // example of the provider -> modelProvider -> model hierarchy: one OVERALL
     // provider owning several distinct SERVING BACKENDS (modelProviders) that
     // may serve overlapping model sets (dupes are valid, keyed by path).
