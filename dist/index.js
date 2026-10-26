@@ -1706,6 +1706,15 @@ var PROVIDER_DEFS = [
     ]
   }
 ];
+function resolveContext(modelId) {
+  for (const provider of PROVIDER_DEFS) {
+    const contextLength = provider.contextLengths?.[modelId];
+    if (contextLength !== undefined) {
+      return { modelId, contextLength, provider: provider.name };
+    }
+  }
+  return;
+}
 var MODEL_ALIASES = {
   "nemotron-nano": ["nvidia", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"],
   "nim-nemotron-super": ["nvidia", "nvidia/nemotron-3-super-120b-a12b"],
@@ -2372,5 +2381,6 @@ export {
   loadCatalogProviderDefs,
   loadDropInDefs,
   loadProviderDefs,
+  resolveContext,
   synthesizeProviderDef
 };

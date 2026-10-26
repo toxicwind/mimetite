@@ -1262,6 +1262,31 @@ export const PROVIDER_DEFS: ProviderDef[] = [
 ];
 
 /**
+ * Resolve the context window for a model id across all provider contextLengths maps.
+ * Returns the first match found (provider order in PROVIDER_DEFS is priority order),
+ * or undefined if no provider declares a context length for the model id.
+ *
+ * This is the estate SSOT for context windows — it replaces the stale bundled
+ * models.json values that tau previously fell back to.
+ */
+export type ResolveContextResult = {
+  modelId: string;
+  contextLength: number;
+  provider: string;
+};
+
+export function resolveContext(modelId: string): ResolveContextResult | undefined {
+  for (const provider of PROVIDER_DEFS) {
+    const contextLength = provider.contextLengths?.[modelId];
+    if (contextLength !== undefined) {
+      return { modelId, contextLength, provider: provider.name };
+    }
+  }
+  return undefined;
+}
+
+
+/**
  * MODEL_ALIASES — friendly alias → [provider, model] (UX layer).
  *
  * Union of estate-scripts-router-ts CODING and bornite codingAlias (see header for

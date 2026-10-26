@@ -1,6 +1,6 @@
 {
   "$schema": "estate-mimetite/v1",
-  "generatedAt": "2026-10-26T18:33:05.000Z",
+  "generatedAt": "2026-10-26T20:20:08.000Z",
   "generator": "@toxicwind/mimetite codegen — DO NOT EDIT BY HAND",
   "provenance": "@toxicwind/mimetite src/data.ts",
   "adapters": [
