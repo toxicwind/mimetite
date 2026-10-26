@@ -6,6 +6,7 @@
   "name": "@toxicwind/mimetite",
   "scripts": {
     "build": "bun ./scripts/build.ts && bun build ./src/index.ts --target=bun --outdir ./dist && bun ./scripts/gen-facts.ts",
+    "conformance": "bun ./scripts/conformance.ts",
     "facts": "bun ./scripts/gen-facts.ts",
     "test": "bun test",
     "typecheck": "bunx tsc --noEmit -p tsconfig.json",

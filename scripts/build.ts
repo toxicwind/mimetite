@@ -18,16 +18,39 @@ const here = dirname(fileURLToPath(import.meta.url));
 const outDir = join(here, "..", "generated");
 
 /**
- * flock's checked-in copy of the Rust data module. It was previously a
- * hand-copied snapshot that silently drifted — it was 6 days stale and
- * predated the vansrouter/omniroute definitions entirely. The build now
- * writes it, so "DO NOT EDIT BY HAND" is enforced by the generator
- * instead of by convention. Both trees live on the same estate
+ * rhodochrosite's checked-in copy of the Rust data module. It was
+ * previously a hand-copied snapshot that silently drifted — it was 6 days
+ * stale and predated the vansrouter/omniroute definitions entirely. The
+ * build now writes it, so "DO NOT EDIT BY HAND" is enforced by the
+ * generator instead of by convention. Both trees live on the same estate
  * filesystem (rhodochrosite is its own repo), so a relative path reaches it.
+ *
+ * Named after the retired "flock-proxy" line (flock → rhodochrosite rename,
+ * 2026-10-26). `roost_providers.rs` is a legacy alias module rhodochrosite's
+ * providers.rs still imports for wire-field authority; `mimetite_providers.rs`
+ * is the canonical module the hard rename lands on. The forge/router/
+ * flock-proxy copy is the retired container's tree (preserved, not live) —
+ * kept in sync so a dead file can't drift under a still-tracked build.
  */
-const FLOCK_RUST_PATHS = [
-  resolve(here, "..", "..", "rhodochrosite", "proxy", "src", "roost_providers.rs"),
-  resolve(here, "..", "..", "rhodochrosite", "proxy", "src", "mimetite_providers.rs"),
+const PROVIDERS_RUST_SYNC_PATHS = [
+  resolve(
+    here,
+    "..",
+    "..",
+    "rhodochrosite",
+    "proxy",
+    "src",
+    "roost_providers.rs",
+  ),
+  resolve(
+    here,
+    "..",
+    "..",
+    "rhodochrosite",
+    "proxy",
+    "src",
+    "mimetite_providers.rs",
+  ),
   // forge/router/flock-proxy is a second Rust flock-proxy copy (tracked in the
   // forge repo). Its own copy-in-sync gate is fixed in the same rename; keep it
   // emitted by this build so it can't silently drift again.
@@ -71,7 +94,7 @@ console.log(`wrote ${kappaPath}`);
 // flock's Rust consumer keeps its data module in its own src/ tree, so the
 // emitter writes both copies from one render. Copying by hand is what let
 // the two drift.
-for (const p of FLOCK_RUST_PATHS) {
+for (const p of PROVIDERS_RUST_SYNC_PATHS) {
   try {
     await Bun.write(p, await Bun.file(rustPath).text());
     console.log(`wrote ${p}`);

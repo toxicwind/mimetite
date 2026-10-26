@@ -612,11 +612,11 @@ export function buildProvidersTauYaml(input: CodegenInput): string {
     "providers:",
     // The :25193 estate gateway is the rhodochrosite product (renamed from the
     // retired "flock" name). Its /v1/models surface serves the estate/* routes;
-    // the key file keeps its legacy name for keyring continuity.
+    // the key now lives at ~/.tau/rhodochrosite.key (renamed 2026-10-26).
     "  rhodochrosite:",
     "    baseUrl: http://127.0.0.1:25193/v1",
     "    api: openai-completions",
-    '    apiKey: "!cat /home/toxic/.tau/flock.key"',
+    '    apiKey: "!cat /home/toxic/.tau/rhodochrosite.key"',
     "    discovery:",
     "      type: openai-models-list",
   ];
@@ -682,6 +682,87 @@ export function buildProvidersTauYaml(input: CodegenInput): string {
 }
 
 /** Emit all artifacts into outDir. Returns the written paths. */
+export interface RouteContractRoute {
+  provider: string;
+  /** null for legacy flat defs (the provider is its own backend). */
+  modelProvider: string | null;
+  baseUrl: string;
+  api: string;
+  auth: string;
+  keyEnv: string;
+  /** ids the contract declares as serve targets (seeds; discovery may grow it). */
+  seeds: string[];
+  healthPath: string;
+  /** statuses that mean "front door alive" (200 = open, 401 = auth wall OK). */
+  healthOk: number[];
+  probePath: string;
+}
+
+/**
+ * The declared route contract: every serving surface the catalog claims,
+ * with the health/probe expectations conformance checks validate against.
+ * DECLARED ≠ OBSERVED — this file is the declared half; scripts/conformance.ts
+ * is the observed half and fails on drift (the estate/fast incident class).
+ */
+
+/** /models path relative to baseUrl (most baseUrls already carry /v1). */
+function modelsPathFor(baseUrl: string): string {
+  return /\/v\d+$/.test(baseUrl.replace(/\/$/, "")) ? "/models" : "/v1/models";
+}
+
+export function buildRoutesContract(input: CodegenInput): string {
+  const routes: RouteContractRoute[] = [];
+  for (const d of input.defs) {
+    if (d.enabled === false || d.routerLocal) continue;
+    if (d.modelProviders && d.modelProviders.length > 0) {
+      for (const mp of d.modelProviders) {
+        if (mp.enabled === false || mp.routerLocal) continue;
+        const base = mp.baseUrl.replace(/\/$/, "");
+        routes.push({
+          provider: d.name,
+          modelProvider: mp.name,
+          baseUrl: mp.baseUrl,
+          api: "openai-completions",
+          auth: mp.auth,
+          keyEnv: mp.keyEnv,
+          seeds: mp.seeds ?? [],
+          healthPath: modelsPathFor(base),
+          healthOk: [200, 401],
+          probePath: "/chat/completions",
+        });
+      }
+      continue;
+    }
+    const base = d.baseUrl.replace(/\/$/, "");
+    routes.push({
+      provider: d.name,
+      modelProvider: null,
+      baseUrl: d.baseUrl,
+      api:
+        d.adapter === "google-v1beta" ? "google-v1beta" : "openai-completions",
+      auth: d.auth,
+      keyEnv: d.keyEnv,
+      seeds: d.seeds ?? [],
+      healthPath: modelsPathFor(base),
+      healthOk: [200, 401],
+      probePath: base.endsWith("/gemini-eap-interactions")
+        ? "/chat/completions"
+        : modelsPathFor(base).replace(/models$/, "chat/completions"),
+    });
+  }
+  const contract = {
+    schema: "routes-contract/1",
+    generatedAt: new Date().toISOString(),
+    provenance: input.provenance,
+    directives: {
+      lanes: ["auto", "code", "free", "reasoning"],
+      note: "estate/<lane> ids; live-verified 2026-10-26. estate/fast is NOT implemented upstream and must fail fast client-side.",
+    },
+    routes,
+  };
+  return JSON.stringify(contract, null, 2) + "\n";
+}
+
 export async function emitAll(
   outDir: string,
   input: CodegenInput,
@@ -691,6 +772,7 @@ export async function emitAll(
   rustPath: string;
   tauPath: string;
   kappaPath: string;
+  contractPath: string;
 }> {
   const { promises: fs } = await import("node:fs");
   const { join } = await import("node:path");
@@ -701,6 +783,7 @@ export async function emitAll(
   const tauPath = join(outDir, "tau-models.yml");
   const kappaPath = join(outDir, "providers.kappa.json");
   const kappaModelsPath = join(outDir, "kappa-models.json");
+  const contractPath = join(outDir, "routes-contract.json");
   await fs.writeFile(jsonPath, buildProvidersJson(input), "utf8");
   await fs.writeFile(goPath, buildProvidersGo(input), "utf8");
   await fs.writeFile(rustPath, buildProvidersRust(input), "utf8");
@@ -708,5 +791,6 @@ export async function emitAll(
   const kappaContent = buildProvidersKappaJson(input);
   await fs.writeFile(kappaPath, kappaContent, "utf8");
   await fs.writeFile(kappaModelsPath, kappaContent, "utf8");
-  return { jsonPath, goPath, rustPath, tauPath, kappaPath };
+  await fs.writeFile(contractPath, buildRoutesContract(input), "utf8");
+  return { jsonPath, goPath, rustPath, tauPath, kappaPath, contractPath };
 }

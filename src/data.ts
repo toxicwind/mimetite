@@ -133,11 +133,15 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     name: "rhodochrosite",
     displayName: "Rhodochrosite (estate multi-provider gateway)",
     // rhodochrosite :25193 is the estate's multi-provider inference gateway
-    // (pens/geode/products/rhodochrosite, "flock" circuit). It is the FIRST-CLASS
-    // example of the provider -> modelProvider -> model hierarchy: one OVERALL
-    // provider owning several distinct SERVING BACKENDS (modelProviders) that
-    // may serve overlapping model sets (dupes are valid, keyed by path).
-    // Chain: chalcopyrite :25200 -> flock :25193 -> vans.
+    // (pens/geode/products/rhodochrosite; renamed from the retired "flock"
+    // name — keyring label FLOCK_API_KEY and ~/.tau/flock.key keep the old
+    // name for continuity). It is the FIRST-CLASS example of the
+    // provider -> modelProvider -> model hierarchy: the gateway is the
+    // provider AND its own :25193 discovery surface (the /v1/models wall
+    // serves the estate/* lane fleet), while modelProviders carry the
+    // distinct serving backends. Overlapping model sets are VALID (dupes
+    // keyed by path).
+    // Chain: chalcopyrite :25200 -> rhodochrosite :25193 -> vans.
     baseUrl: "http://127.0.0.1:25193/v1",
     keyEnv: "RHODOCHROSITE_API_KEY",
     auth: "bearer",
@@ -152,9 +156,12 @@ export const PROVIDER_DEFS: ProviderDef[] = [
         auth: "bearer",
         adapter: "openai",
         seeds: [
-          // Same super model served by flock too — a VALID dupe across two
-          // modelProviders, disambiguated by path rhodochrosite.flock vs rhodochrosite.chalcopyrite.
-          "nvidia/nemotron-3.5-super-vl-120b-a12b",
+          // Same super model served by the gateway too — a VALID dupe across
+          // modelProviders, disambiguated by path rhodochrosite vs rhodochrosite.chalcopyrite.
+          // OpenRouter id (ver. 3.5 retired there per models/user, 2026-10-26):
+          // "nemotron-3-super-120b-a12b" is the reachable current id. secure-nim
+          // keeps nemotron-3.5-super-vl-120b-a12b (NVIDIA integrate API serves it).
+          "nvidia/nemotron-3-super-120b-a12b",
           "openai/gpt-oss-20b",
         ],
       },
@@ -176,11 +183,13 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     name: "nvidia",
     baseUrl: "https://integrate.api.nvidia.com/v1",
     keyEnv: "NVIDIA_API_KEY",
-    // N-key pool: comma-separated. NVIDIA_API_KEYS is the multi-key var;
-    // NIM_PROXY_API_KEY is the retired nim-proxy container's key, which was
-    // measured 5/5 on completions vs the estate cloud key's 3/5 (5 head-to-head
-    // trials, 2026-10-09) — same 80-model upstream reachable through either.
-    keyEnvAlt: "NVIDIA_API_KEYS,NIM_PROXY_API_KEY",
+    // Entitlement audit 2026-10-26 (live probed, both keys x 4 models):
+    // NVIDIA_API_KEY (nvapi-...udTy) is THE entitled key on this baseUrl —
+    // nemotron-3.5-super-vl + lightning answer 200. NIM_PROXY_API_KEY is
+    // the nim-proxy service's credential and 401s here with "Invalid JWT
+    // serialization" on EVERY model — it was listed as keyEnvAlt and that
+    // alternate is what tau sessions were sending when they key-rotated
+    // into a 401 wall. Removed: one baseUrl, one key class.
     auth: "bearer",
     adapter: "openai",
     // Seeds are the entitlement-verified working set (2026-10-03
@@ -1275,7 +1284,9 @@ export type ResolveContextResult = {
   provider: string;
 };
 
-export function resolveContext(modelId: string): ResolveContextResult | undefined {
+export function resolveContext(
+  modelId: string,
+): ResolveContextResult | undefined {
   for (const provider of PROVIDER_DEFS) {
     const contextLength = provider.contextLengths?.[modelId];
     if (contextLength !== undefined) {
@@ -1284,7 +1295,6 @@ export function resolveContext(modelId: string): ResolveContextResult | undefine
   }
   return undefined;
 }
-
 
 /**
  * MODEL_ALIASES — friendly alias → [provider, model] (UX layer).

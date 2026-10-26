@@ -14,7 +14,7 @@ hand-maintained copies.
 - **Single source of truth** for provider definitions — base URL, key env var,
   endpoint-shape adapter, cold-start seeds, context windows, dead ids.
 - **Live discovery** is the source of truth for membership: fetch `/models`
-  across all known endpoint shapes, keep the *last successful* listing.
+  across all known endpoint shapes, keep the _last successful_ listing.
 - **Auto-quarantine** removes dead or vanished models automatically — never
   served, always observable, re-admitted on re-listing.
 - **`provider → modelProvider → model` hierarchy** — one vendor (rhodochrosite) can
@@ -27,7 +27,7 @@ hand-maintained copies.
 ## Why it exists
 
 Every consumer used to hand-maintain its own provider→model list. Live discovery
-could only *add* — nothing ever removed a dead id. Result: 4 of 6 groq ids
+could only _add_ — nothing ever removed a dead id. Result: 4 of 6 groq ids
 404'd in production until a human noticed. Mimetite makes the **live listing the
 source of truth** and demotes curation to cold-start seeds. One mimetite; nobody
 keeps a private nest. When a provider kills a model, the whole estate learns
@@ -45,7 +45,7 @@ dead list. The semantics (enforced in `src/catalog.ts`):
 1. **Cold start**: `seeds` serve until the provider's first successful
    discovery; afterwards seeds go **inert** (they may still inform stable
    ordering, never membership).
-2. **Failed refresh changes nothing**: miss counters move only on *successful*
+2. **Failed refresh changes nothing**: miss counters move only on _successful_
    refreshes; a failure keeps serving last-known-good (stale-serve).
 3. **Two-refresh prune** (`PRUNE_AFTER_MISSES = 2`): an id missing from the
    live listing is not dropped immediately — it accrues a miss per consecutive
@@ -64,7 +64,7 @@ dead list. The semantics (enforced in `src/catalog.ts`):
 
 Every serving model carries a `ModelSource` — `live | seed | overlay |
 quarantined | dead | unknown` — surfaced on `/v1/models` and `/status`. You can
-always tell *why* an id is visible: it's either discovery-listed, a cold-start
+always tell _why_ an id is visible: it's either discovery-listed, a cold-start
 seed (pre-discovery only), a runtime overlay, or quarantined/dead (and thus not
 served).
 
@@ -160,19 +160,23 @@ or catalog logic. Each adapter is total on its input contract and throws
 
 A top-level **provider** (rhodochrosite, freeinference, google, groq) is a vendor or
 gateway. It can serve a model set through **one or more distinct serving
-backends** — a **modelProvider** (e.g. rhodochrosite owns `flock` :25193,
-`chalcopyrite` :25200, `secure-nim`). Each modelProvider carries its own
+backends** — a **modelProvider** (e.g. rhodochrosite owns `chalcopyrite`
+:25200 and `secure-nim`; the :25193 gateway itself is the provider's own
+discovery surface). Each modelProvider carries its own
 `baseUrl`/`keyEnv`/`adapter` and its own model list — and a provider without
 `modelProviders` resolves at the implicit legacy flat backend (unchanged
 behavior).
 
-- **Dupes are VALID.** The same model id in two modelProviders is *not*
+- **Dupes are VALID.** The same model id in two modelProviders is _not_
   deduped; it is disambiguated by the path `provider.modelProvider.model`.
 - `ModelCatalog.allServingByModelProvider()` returns every
   `{ provider, modelProvider, id, source }` row, dupes intact.
 - Generated artifacts expose the layer: kappa gets disambiguated provider-map
-  keys (`rhodochrosite.flock`, …); tau models.yml and bornite/flock artifacts carry the
-  rhodochrosite defs.
+  keys (`rhodochrosite.chalcopyrite`, …); tau models.yml emits three-tier
+  provider ids (`rhodochrosite`, `rhodochrosite.chalcopyrite`,
+  `rhodochrosite.secure-nim`) and drops the deprecated flat block for
+  providers that own modelProviders (renamed from the retired `flock` id,
+  2026-10-26).
 
 ## Persistence
 
@@ -215,13 +219,13 @@ bun test`) through mise; eligible task artifacts restore through mbx-cache.
 
 ## Consumers
 
-| Consumer | How it consumes | Status |
-|---|---|---|
-| **tau** (`toxicwind/tau`) | reads `tau-models.yml` | provider authority for the coding-agent engine |
-| **bornite** (Go) | `internal/astmatrix/providers.go` — generated, checked in, never hand-edited; reads the live-catalog export for live sets | Provenance `@toxicwind/mimetite` |
-| **flock** (Rust) | `proxy/src/mimetite_providers.rs` — generated data module, synced by build | wire data only; flock keeps its operational overlay |
-| **kappa** (Go+TS) | `generated/kappa-models.json` (full) + installed slice | two profiles: canonical catalog + env-filtered live config |
-| **Python research scripts** | `generated/providers.json` (canonical) + `*.live.json` (derived) | stable schemas `estate-mimetite/v1` / `live-catalog/v1` |
+| Consumer                    | How it consumes                                                                                                           | Status                                                     |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| **tau** (`toxicwind/tau`)   | reads `tau-models.yml`                                                                                                    | provider authority for the coding-agent engine             |
+| **bornite** (Go)            | `internal/astmatrix/providers.go` — generated, checked in, never hand-edited; reads the live-catalog export for live sets | Provenance `@toxicwind/mimetite`                           |
+| **flock** (Rust)            | `proxy/src/mimetite_providers.rs` — generated data module, synced by build                                                | wire data only; flock keeps its operational overlay        |
+| **kappa** (Go+TS)           | `generated/kappa-models.json` (full) + installed slice                                                                    | two profiles: canonical catalog + env-filtered live config |
+| **Python research scripts** | `generated/providers.json` (canonical) + `*.live.json` (derived)                                                          | stable schemas `estate-mimetite/v1` / `live-catalog/v1`    |
 
 ## Research & deep-dives
 

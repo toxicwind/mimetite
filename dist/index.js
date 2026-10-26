@@ -656,7 +656,7 @@ var PROVIDER_DEFS = [
         auth: "bearer",
         adapter: "openai",
         seeds: [
-          "nvidia/nemotron-3.5-super-vl-120b-a12b",
+          "nvidia/nemotron-3-super-120b-a12b",
           "openai/gpt-oss-20b"
         ]
       },
@@ -678,7 +678,6 @@ var PROVIDER_DEFS = [
     name: "nvidia",
     baseUrl: "https://integrate.api.nvidia.com/v1",
     keyEnv: "NVIDIA_API_KEY",
-    keyEnvAlt: "NVIDIA_API_KEYS,NIM_PROXY_API_KEY",
     auth: "bearer",
     adapter: "openai",
     seeds: [
@@ -2278,7 +2277,7 @@ function buildProvidersTauYaml(input) {
     "  rhodochrosite:",
     "    baseUrl: http://127.0.0.1:25193/v1",
     "    api: openai-completions",
-    '    apiKey: "!cat /home/toxic/.tau/flock.key"',
+    '    apiKey: "!cat /home/toxic/.tau/rhodochrosite.key"',
     "    discovery:",
     "      type: openai-models-list"
   ];
@@ -2338,6 +2337,61 @@ function buildProvidersTauYaml(input) {
 `) + `
 `;
 }
+function modelsPathFor(baseUrl) {
+  return /\/v\d+$/.test(baseUrl.replace(/\/$/, "")) ? "/models" : "/v1/models";
+}
+function buildRoutesContract(input) {
+  const routes = [];
+  for (const d of input.defs) {
+    if (d.enabled === false || d.routerLocal)
+      continue;
+    if (d.modelProviders && d.modelProviders.length > 0) {
+      for (const mp of d.modelProviders) {
+        if (mp.enabled === false || mp.routerLocal)
+          continue;
+        const base = mp.baseUrl.replace(/\/$/, "");
+        routes.push({
+          provider: d.name,
+          modelProvider: mp.name,
+          baseUrl: mp.baseUrl,
+          api: "openai-completions",
+          auth: mp.auth,
+          keyEnv: mp.keyEnv,
+          seeds: mp.seeds ?? [],
+          healthPath: modelsPathFor(base),
+          healthOk: [200, 401],
+          probePath: "/chat/completions"
+        });
+      }
+      continue;
+    }
+    const base = d.baseUrl.replace(/\/$/, "");
+    routes.push({
+      provider: d.name,
+      modelProvider: null,
+      baseUrl: d.baseUrl,
+      api: d.adapter === "google-v1beta" ? "google-v1beta" : "openai-completions",
+      auth: d.auth,
+      keyEnv: d.keyEnv,
+      seeds: d.seeds ?? [],
+      healthPath: modelsPathFor(base),
+      healthOk: [200, 401],
+      probePath: base.endsWith("/gemini-eap-interactions") ? "/chat/completions" : modelsPathFor(base).replace(/models$/, "chat/completions")
+    });
+  }
+  const contract = {
+    schema: "routes-contract/1",
+    generatedAt: new Date().toISOString(),
+    provenance: input.provenance,
+    directives: {
+      lanes: ["auto", "code", "free", "reasoning"],
+      note: "estate/<lane> ids; live-verified 2026-10-26. estate/fast is NOT implemented upstream and must fail fast client-side."
+    },
+    routes
+  };
+  return JSON.stringify(contract, null, 2) + `
+`;
+}
 async function emitAll(outDir, input) {
   const { promises: fs } = await import("fs");
   const { join } = await import("path");
@@ -2348,6 +2402,7 @@ async function emitAll(outDir, input) {
   const tauPath = join(outDir, "tau-models.yml");
   const kappaPath = join(outDir, "providers.kappa.json");
   const kappaModelsPath = join(outDir, "kappa-models.json");
+  const contractPath = join(outDir, "routes-contract.json");
   await fs.writeFile(jsonPath, buildProvidersJson(input), "utf8");
   await fs.writeFile(goPath, buildProvidersGo(input), "utf8");
   await fs.writeFile(rustPath, buildProvidersRust(input), "utf8");
@@ -2355,7 +2410,8 @@ async function emitAll(outDir, input) {
   const kappaContent = buildProvidersKappaJson(input);
   await fs.writeFile(kappaPath, kappaContent, "utf8");
   await fs.writeFile(kappaModelsPath, kappaContent, "utf8");
-  return { jsonPath, goPath, rustPath, tauPath, kappaPath };
+  await fs.writeFile(contractPath, buildRoutesContract(input), "utf8");
+  return { jsonPath, goPath, rustPath, tauPath, kappaPath, contractPath };
 }
 export {
   ADAPTERS,

@@ -3,7 +3,7 @@
   "contract": "estate-mimetite/kappa-catalog/v1",
   "generator": "@toxicwind/mimetite codegen — kappa target (full profile) — DO NOT EDIT BY HAND",
   "provenance": "@toxicwind/mimetite src/data.ts",
-  "generatedAt": "2026-10-26T20:20:08.000Z",
+  "generatedAt": "2026-10-26T20:29:32.000Z",
   "deadIds": [
     "llama-3.3-70b-versatile",
     "meta-llama/llama-3.1-8b-instruct",
@@ -824,8 +824,8 @@
         "apiKey": "{env:CUTTINGGATE_API_KEY}"
       },
       "models": {
-        "nvidia/nemotron-3.5-super-vl-120b-a12b": {
-          "name": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+        "nvidia/nemotron-3-super-120b-a12b": {
+          "name": "nvidia/nemotron-3-super-120b-a12b",
           "limit": {
             "context": 128000,
             "output": 8192
@@ -5171,7 +5171,7 @@
           "adapter": "openai",
           "auth": "bearer",
           "seeds": [
-            "nvidia/nemotron-3.5-super-vl-120b-a12b",
+            "nvidia/nemotron-3-super-120b-a12b",
             "openai/gpt-oss-20b"
           ]
         },
@@ -5192,11 +5192,8 @@
       "name": "nvidia",
       "baseUrl": "https://integrate.api.nvidia.com/v1",
       "keyEnv": "NVIDIA_API_KEY",
-      "keyEnvAlt": "NVIDIA_API_KEYS,NIM_PROXY_API_KEY",
       "keyEnvs": [
-        "NVIDIA_API_KEY",
-        "NVIDIA_API_KEYS",
-        "NIM_PROXY_API_KEY"
+        "NVIDIA_API_KEY"
       ],
       "adapter": "openai",
       "auth": "bearer"
