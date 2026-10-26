@@ -35,7 +35,7 @@ export declare function codegenTimestamp(): string;
 export declare function buildProvidersJson(input: CodegenInput): string;
 /**
  * Canonical JSON artifact for the Kappa agent (both full catalog and config-ready).
- * Profile 1: Full catalog containing all enabled providers in Pinax.
+ * Profile 1: Full catalog containing all enabled providers in Mimetite.
  */
 export declare function buildProvidersKappaJson(input: CodegenInput): string;
 /**

@@ -108,7 +108,7 @@ export declare class ModelCatalog {
      * they must not recompute membership themselves. The TS package remains
      * the only place the catalog logic exists.
      *
-     * Contract: estate-pinax/live-catalog/v1
+     * Contract: estate-mimetite/live-catalog/v1
      */
     liveCatalogJson(): LiveCatalogJson;
     /** Sibling path for the live-catalog export next to a state file path. */

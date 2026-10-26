@@ -17,7 +17,7 @@
 
 `unhealthy: 0`. freeinference is **7 of 555 models** but lowest-latency of the big pools (90ms vs openrouter 504ms).
 
-## freeinference in hodos (`proxy/src/pinax_providers.rs`)
+## freeinference in hodos (`proxy/src/mimetite_providers.rs`)
 
 - `base_url: https://freeinference.org/v1`, `key_env: FREEINFERENCE_API_KEY`, adapter `openai`, `enabled: true`.
 - Context lengths: **deepseek-v4-flash = 1,000,000** (also glm-5.3-flash, minimax-m3 at 1M; qwen3.6-35b / diffusiongemma at 262k).

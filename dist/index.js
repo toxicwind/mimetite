@@ -2168,7 +2168,7 @@ ${fields.map((f) => `        ${f}`).join(`
 // Generated at: ${generatedAt}
 
 /// Provenance of the Mimetite catalog revision this module was generated from.
-pub const PINAX_PROVENANCE: &str = ${jsonEscaped(provenance)};
+pub const MIMETITE_PROVENANCE: &str = ${jsonEscaped(provenance)};
 
 /// One provider's wire data, generated from the Mimetite catalog.
 /// Flock builds its operational ProviderDefs from this table merged with
@@ -2199,7 +2199,7 @@ pub struct PinaxProvider {
     pub router_local: bool,
     /// Disabled providers are never fetched and never served.
     pub enabled: bool,
-    /// Cold-start seeds ONLY. May name dead IDs \u2014 filter PINAX_DEAD_IDS.
+    /// Cold-start seeds ONLY. May name dead IDs \u2014 filter MIMETITE_DEAD_IDS.
     pub seeds: &'static [&'static str],
     /// Adapter "static": the model list, carried in the definition.
     pub static_models: &'static [&'static str],
@@ -2208,25 +2208,25 @@ pub struct PinaxProvider {
 }
 
 /// The canonical provider table, generated from the Mimetite catalog.
-pub const PINAX_PROVIDERS: &[PinaxProvider] = &[
+pub const MIMETITE_PROVIDERS: &[PinaxProvider] = &[
 ${defs}
 ];
 
 /// Permanent EOL tier (hand-managed). Never served, never re-admitted:
 /// filter these out of seeds and live listings alike.
-pub const PINAX_DEAD_IDS: &[&str] = ${rustStrSlice(deadIds)};
+pub const MIMETITE_DEAD_IDS: &[&str] = ${rustStrSlice(deadIds)};
 
 /// Friendly alias -> (provider, canonical model id) (UX layer).
-pub const PINAX_ALIASES: &[(&str, &str, &str)] = &[
+pub const MIMETITE_ALIASES: &[(&str, &str, &str)] = &[
 ${aliases}
 ];
 
 // Backwards-compatibility aliases for legacy consumers.
 pub type RoostProvider = PinaxProvider;
-pub const ROOST_PROVENANCE: &str = PINAX_PROVENANCE;
-pub const ROOST_PROVIDERS: &[PinaxProvider] = PINAX_PROVIDERS;
-pub const ROOST_DEAD_IDS: &[&str] = PINAX_DEAD_IDS;
-pub const ROOST_ALIASES: &[(&str, &str, &str)] = PINAX_ALIASES;
+pub const ROOST_PROVENANCE: &str = MIMETITE_PROVENANCE;
+pub const ROOST_PROVIDERS: &[PinaxProvider] = MIMETITE_PROVIDERS;
+pub const ROOST_DEAD_IDS: &[&str] = MIMETITE_DEAD_IDS;
+pub const ROOST_ALIASES: &[(&str, &str, &str)] = MIMETITE_ALIASES;
 `;
 }
 function buildInstalledTauYaml(input, env) {

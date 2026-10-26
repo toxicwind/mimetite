@@ -86,7 +86,7 @@ scripts/build.ts  `bun run build` — regenerates generated/ + syncs installed s
 generated/
   providers.json       canonical JSON artifact (Python consumers), $schema estate-mimetite/v1
   providers.go         drop-in Go data file for herd (package astmatrix)
-  providers.rs         drop-in Rust data module for flock (PINAX_* constants)
+  providers.rs         drop-in Rust data module for flock (MIMETITE_* constants)
   tau-models.yml       canonical YAML model catalog for Tau
   kappa-models.json    canonical Kappa provider config (full profile)
   providers.kappa.json compatibility JSON artifact for Kappa tooling
@@ -219,7 +219,7 @@ bun test`) through mise; eligible task artifacts restore through mbx-cache.
 |---|---|---|
 | **tau** (`toxicwind/tau`) | reads `tau-models.yml` | provider authority for the coding-agent engine |
 | **herd** (Go) | `internal/astmatrix/providers.go` — generated, checked in, never hand-edited; reads the live-catalog export for live sets | Provenance `@toxicwind/mimetite` |
-| **flock** (Rust) | `proxy/src/pinax_providers.rs` — generated data module, synced by build | wire data only; flock keeps its operational overlay |
+| **flock** (Rust) | `proxy/src/mimetite_providers.rs` — generated data module, synced by build | wire data only; flock keeps its operational overlay |
 | **kappa** (Go+TS) | `generated/kappa-models.json` (full) + installed slice | two profiles: canonical catalog + env-filtered live config |
 | **Python research scripts** | `generated/providers.json` (canonical) + `*.live.json` (derived) | stable schemas `estate-mimetite/v1` / `live-catalog/v1` |
 
