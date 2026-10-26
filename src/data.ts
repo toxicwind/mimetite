@@ -206,9 +206,10 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     contextLengths: {
       "deepseek-ai/deepseek-v4.1-flash": 256000,
       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning": 256000,
-      "nvidia/nemotron-3-super-120b-a12b": 500000,
-      "nvidia/nemotron-3-ultra-550b-a55b": 1000000,
-      "openai/gpt-oss-20b": 128000,
+      "nvidia/nemotron-3-super-120b-a12b": 262144,
+      "nvidia/nemotron-3-ultra-550b-a55b": 1048576,
+      "nvidia/nemotron-3.5-lightning-30b-a3b": 1048576,
+      "openai/gpt-oss-20b": 131072,
       "z-ai/glm-5.3": 200000,
       "z-ai/glm-5.3-flash": 200000,
     },

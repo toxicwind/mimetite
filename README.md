@@ -108,7 +108,7 @@ tests/          tests — adapters, catalog, codegen, concurrency, auto-loader, 
 | model aliases | 24 |
 | dead model ids | 16 |
 | endpoint adapters | 5 (openai, mistral, google-v1beta, static, none) |
-| tests | 98 across tests/*.test.ts |
+| tests | 99 across tests/*.test.ts |
 
 <!-- FACTS:END -->
 

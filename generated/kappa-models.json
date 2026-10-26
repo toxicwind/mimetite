@@ -3,7 +3,7 @@
   "contract": "estate-mimetite/kappa-catalog/v1",
   "generator": "@toxicwind/mimetite codegen — kappa target (full profile) — DO NOT EDIT BY HAND",
   "provenance": "@toxicwind/mimetite src/data.ts",
-  "generatedAt": "2026-10-25T21:56:02.000Z",
+  "generatedAt": "2026-10-26T18:33:05.000Z",
   "deadIds": [
     "llama-3.3-70b-versatile",
     "meta-llama/llama-3.1-8b-instruct",
@@ -807,15 +807,6 @@
         }
       }
     },
-    "bornite": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Bornite (local VRAM engine)",
-      "options": {
-        "baseURL": "http://127.0.0.1:25100/v1",
-        "apiKey": "none"
-      },
-      "models": {}
-    },
     "rhodochrosite": {
       "npm": "@ai-sdk/openai-compatible",
       "name": "Rhodochrosite (estate multi-provider gateway)",
@@ -912,7 +903,7 @@
         "nvidia/nemotron-3-super-120b-a12b": {
           "name": "nvidia/nemotron-3-super-120b-a12b",
           "limit": {
-            "context": 500000,
+            "context": 262144,
             "output": 8192
           }
         },
@@ -926,7 +917,7 @@
         "nvidia/nemotron-3.5-lightning-30b-a3b": {
           "name": "nvidia/nemotron-3.5-lightning-30b-a3b",
           "limit": {
-            "context": 128000,
+            "context": 1048576,
             "output": 8192
           }
         },
@@ -954,7 +945,7 @@
         "openai/gpt-oss-20b": {
           "name": "openai/gpt-oss-20b",
           "limit": {
-            "context": 128000,
+            "context": 131072,
             "output": 8192
           }
         },
