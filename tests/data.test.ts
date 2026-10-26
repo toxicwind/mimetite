@@ -1,6 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { ModelCatalog } from "../src/catalog.ts";
-import { DEAD_MODEL_IDS, MODEL_ALIASES, PROVIDER_DEFS } from "../src/data.ts";
+import {
+  DEAD_MODEL_IDS,
+  MODEL_ALIASES,
+  PROVIDER_DEFS,
+  resolveContext,
+} from "../src/data.ts";
 
 describe("reconciled provider data", () => {
   test("provider names are unique", () => {
@@ -50,5 +55,26 @@ describe("reconciled provider data", () => {
       deadIds: DEAD_MODEL_IDS,
     });
     expect(cat.modelsUrl("openai")).toBe("https://api.openai.com/v1/models");
+  });
+
+  test("resolveContext returns the 2M window for the big backbones", () => {
+    // The premise: bodybuilder sends a huge job to the BEST model that can
+    // HOLD the context. 2M-capable models must resolve to 2,000,000.
+    const grok = resolveContext("grok-4.5");
+    expect(grok?.contextLength).toBe(2_000_000);
+    expect(grok?.modelId).toBe("grok-4.5");
+    const grok6 = resolveContext("grok-4.6");
+    expect(grok6?.contextLength).toBe(2_000_000);
+    // 1M-class nemotrons.
+    const ultra = resolveContext("nvidia/nemotron-3-ultra-550b-a55b");
+    expect(ultra?.contextLength).toBe(1_048_576);
+    const lightning = resolveContext("nvidia/nemotron-3.5-lightning-30b-a3b");
+    expect(lightning?.contextLength).toBe(1_048_576);
+  });
+
+  test("resolveContext is undefined for an undeclared id", () => {
+    // An undeclared id has no declared window: bodybuilder must not assume
+    // it can hold a big context (it falls back to smaller-model selection).
+    expect(resolveContext("totally/not-a-known-model")).toBeUndefined();
   });
 });
