@@ -640,17 +640,17 @@ var PROVIDER_DEFS = [
     seeds: []
   },
   {
-    name: "hodos",
-    displayName: "Hodos (estate multi-provider gateway)",
+    name: "rhodochrosite",
+    displayName: "Rhodochrosite (estate multi-provider gateway)",
     baseUrl: "http://127.0.0.1:25193/v1",
-    keyEnv: "HODOS_API_KEY",
+    keyEnv: "RHODOCHROSITE_API_KEY",
     auth: "bearer",
     adapter: "none",
     seeds: [],
     modelProviders: [
       {
-        name: "cuttinggate",
-        displayName: "CuttingGate :25200",
+        name: "chalcopyrite",
+        displayName: "Chalcopyrite :25200",
         baseUrl: "http://127.0.0.1:25200/v1",
         keyEnv: "CUTTINGGATE_API_KEY",
         auth: "bearer",
@@ -1920,7 +1920,7 @@ function buildProvidersKappaJson(input) {
   const provenance = input.provenance ? input.provenance : "unknown";
   const providerMap = {};
   for (const d of input.defs) {
-    if (d.enabled === false || d.routerLocal || d.name === "herd") {
+    if (d.enabled === false || d.routerLocal || d.name === "bornite") {
       continue;
     }
     const models = {};
@@ -1937,8 +1937,8 @@ function buildProvidersKappaJson(input) {
     let apiKey = "none";
     if (d.name === "flock") {
       apiKey = "!cat /home/toxic/.tau/flock.key";
-    } else if (d.name === "hodos") {
-      apiKey = "herd-local";
+    } else if (d.name === "rhodochrosite") {
+      apiKey = "bornite-local";
     } else if (d.auth !== "none" && d.keyEnv) {
       apiKey = `{env:${d.keyEnv}}`;
     }
@@ -2025,7 +2025,7 @@ function buildInstalledKappaJson(input, env = process.env) {
   const defs = input.defs.filter((d) => {
     if (d.enabled === false || d.routerLocal)
       return false;
-    if (d.name === "flock" || d.name === "herd" || d.name === "hodos" || d.auth === "none") {
+    if (d.name === "flock" || d.name === "bornite" || d.name === "rhodochrosite" || d.auth === "none") {
       return true;
     }
     const pool = keyEnvsOf(d);
@@ -2092,7 +2092,7 @@ type CatalogProviderDef struct {
 	ModelsPath     string
 	NoModelsReason string
 	NoAuth         bool // auth === "none": no API key needed
-	RouterLocal    bool // TS-router-local concept; herd skips these
+	RouterLocal    bool // TS-router-local concept; bornite skips these
 	Enabled        bool
 }
 
@@ -2239,7 +2239,7 @@ function buildInstalledTauYaml(input, env) {
   const defs = input.defs.filter((d) => {
     if (d.enabled === false || d.routerLocal)
       return false;
-    if (d.name === "flock" || d.name === "herd" || d.auth === "none")
+    if (d.name === "flock" || d.name === "bornite" || d.auth === "none")
       return true;
     const pool = keyEnvsOf(d);
     if (pool.length === 0)
@@ -2273,7 +2273,7 @@ function buildProvidersTauYaml(input) {
     "      type: openai-models-list"
   ];
   for (const d of input.defs) {
-    if (d.enabled === false || d.routerLocal || d.name === "herd") {
+    if (d.enabled === false || d.routerLocal || d.name === "bornite") {
       continue;
     }
     lines.push(`  ${d.name}:`);

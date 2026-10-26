@@ -12,7 +12,7 @@ export type AdapterId =
   | "openai" // GET {base}/models -> { data: [{ id }] }  (groq, cerebras, openrouter, nvidia, mistral-compat, google openai-compat)
   | "google-v1beta" // GET {base}/v1beta/models -> { models: [{ name: "models/..." }] }
   | "mistral" // GET {base}/v1/models -> { object:"list", data: [{ id }] } (pinned separately so a future divergence is a one-parser fix)
-  | "static" // no HTTP fetch; the definition carries the model list (herd roles)
+  | "static" // no HTTP fetch; the definition carries the model list (bornite roles)
   | "none"; // declared no /models endpoint (kimi-auto); success with zero models
 
 /** How the provider key reaches the /models request. */
@@ -55,7 +55,7 @@ export interface ProviderDef {
   /**
    * True for providers that are concepts of the estate TS router only
    * (local proxies / shims like nim-local and kimi-auto). Other consumers
-   * (herd, TAU, Python) skip these definitions.
+   * (bornite, TAU, Python) skip these definitions.
    */
   routerLocal?: boolean;
   /**
@@ -80,9 +80,9 @@ export interface ProviderDef {
   /**
    * MODEL PROVIDERS (1..N) under this OVERALL provider.
    *
-   * A provider is a vendor/gateway (hodos, freeinference, google). It can
+   * A provider is a vendor/gateway (rhodochrosite, freeinference, google). It can
    * serve the same model set through ONE or MORE distinct SERVING BACKENDS
-   * (a modelProvider): flock :25193, cuttinggate :25200, secure-NIM, a
+   * (a modelProvider): flock :25193, chalcopyrite :25200, secure-NIM, a
    * per-tenant endpoint of freeinference, etc. Each modelProvider carries its
    * OWN baseUrl/keyEnv/adapter and its own model list/seeds. The SAME model id
    * may appear in two modelProviders — that is a VALID dupe, never deduped;
@@ -149,7 +149,7 @@ export interface QuarantineEntry {
 
 /**
  * Friendly alias → [provider, canonical model id] (UX layer).
- * Both TS routers and herd resolve aliases to a provider+model pair, so the
+ * Both TS routers and bornite resolve aliases to a provider+model pair, so the
  * package owns the pair form. Strategy directives (auto/fcm/free → null in
  * the routers) and runtime-dynamic local-role aliases stay router-local.
  */
@@ -173,7 +173,7 @@ export interface PersistedCatalog {
 }
 
 /**
- * Live catalog export — the ANSWER for non-TS consumers (Go herd, Python).
+ * Live catalog export — the ANSWER for non-TS consumers (Go bornite, Python).
  * Pure data: derived serving sets, quarantine lists, discovery flags.
  * Contract: estate-mimetite/live-catalog/v1. Consumers read the serving
  * arrays verbatim; membership logic lives only in the TS package.

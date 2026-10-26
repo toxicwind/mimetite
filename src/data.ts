@@ -4,19 +4,19 @@
  * Reconciled 2026-09-30 from:
  * - estate/mesh/router/estate-scripts-router/estate-scripts-router-ts/router_config.ts
  *   (PROVIDERS, PROVIDER_MODELS, CODING, DEAD_MODEL_IDS)
- * - estate/mesh/router/herd/internal/astmatrix/providers.go
+ * - estate/mesh/router/bornite/internal/astmatrix/providers.go
  *   (defaultProviders, codingAlias)
  *
  * Reconciliation notes (newer audit wins on conflict):
- * - openrouter seeds: TS 2026-09-21 sweep (4 verified) ∪ herd 2026-07-28
+ * - openrouter seeds: TS 2026-09-21 sweep (4 verified) ∪ bornite 2026-07-28
  *   list minus openai/gpt-oss-20b:free (delisted 2026-09-21 → deadIds).
- * - nvidia seeds: TS 12 (superset of herd's minus meta/llama-3.3-70b-instruct,
- *   EOL 2026-08-26 → deadIds). Herd gains nemotron-3-nano-omni-30b-a3b-reasoning.
+ * - nvidia seeds: TS 12 (superset of bornite's minus meta/llama-3.3-70b-instruct,
+ *   EOL 2026-08-26 → deadIds). Bornite gains nemotron-3-nano-omni-30b-a3b-reasoning.
  * - groq seeds: identical in both (6); the 4 verified-dead 2026-09-30 stay
  *   in seeds but are filtered by deadIds everywhere (cold start included).
- * - herd seeds: the canonical stable role names. The TS router
+ * - bornite seeds: the canonical stable role names. The TS router
  *   overlays its runtime LOCAL_ROLES (best-models.json) at catalog build;
- *   herd serves these names directly.
+ *   bornite serves these names directly.
  * - mistral: baseUrl WITHOUT the /v1 segment; the mistral adapter appends
  *   /v1/models via the default modelsPath. (The old `${base}/models`
  *   composition would have produced /v1/models correctly only by accident
@@ -27,17 +27,17 @@
  * - kimi-auto: static ["kimi-auto"] — the shim's virtual model is the whole
  *   list (adapter "none" would wrongly demote the seed after one refresh).
  * - nim-local / kimi-auto are TS-router-local concepts (local proxy + shim);
- *   marked routerLocal: true — herd and other consumers skip them by flag,
+ *   marked routerLocal: true — bornite and other consumers skip them by flag,
  *   no name denylist.
  * - keyEnvAlt for nvidia is NVIDIA_API_KEYS (TS multi-key pool, the live
- *   semantic). Herd previously used NVIDIA_NIM_API_KEY as its alt.
- * - aliases: union of TS CODING + herd codingAlias, restricted to pairs
+ *   semantic). Bornite previously used NVIDIA_NIM_API_KEY as its alt.
+ * - aliases: union of TS CODING + bornite codingAlias, restricted to pairs
  *   whose provider is one of the 9 core defs. Excluded: strategy
  *   directives (auto/fcm/free → null, router-local), runtime-dynamic
  *   local-role aliases (router-local overlays), aliases pointing at
  *   deadIds (nim-llama-3.3-70b, gpt-oss-20b — removed by the TS 2026-09-21
  *   sweep), and extended-registry aliases (opencode, xai-*, mimo-auto,
- *   perplexity-sonar, together-llama-3.3 — they belong to herd's registry
+ *   perplexity-sonar, together-llama-3.3 — they belong to bornite's registry
  *   layer, which stays in registry.go).
  * - Conflict resolutions (newer TS audit wins): nemotron-nano and
  *   nim-nemotron-nano point at the nvidia reasoning model, not the
@@ -52,9 +52,9 @@
 import type { ModelAlias, ProviderDef } from "./types.ts";
 
 export const PROVIDER_DEFS: ProviderDef[] = [
-  // 2026-10-13: `herd` deleted per Chris's order. Local herd models
+  // 2026-10-13: `bornite` deleted per Chris's order. Local bornite models
   // (llama-swap :25100) are not ready; the catalog must not advertise
-  // them. Working chain: cuttinggate :25200 -> flock :25193 -> vans.
+  // them. Working chain: chalcopyrite :25200 -> flock :25193 -> vans.
   // 2026-10-09: `nim-local` deleted. It declared baseUrl 127.0.0.1:8000/v1,
   // which violated the estate port SSOT (all 25xxx, config/ports.env) and
   // contributed ZERO models to the live fleet (verified: 0 nim-local-prefixed
@@ -68,14 +68,14 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     name: "kimi-auto",
     displayName: "kimi-auto shim",
     // 2026-10-02: :25105 is mesh-front/prometheus, not kimi-auto -- the kimi-auto alias-shim is :25153 (200 on /v1/models).
-    // 2026-10-09 (verified): the shim currently serves NOTHING. herd lists 52
+    // 2026-10-09 (verified): the shim currently serves NOTHING. bornite lists 52
     // models and none of the six targets in its chain exist any more
     // (openrouter-free/*, hf-free/*, nim-kimi/* all gone), so every completion
     // returns 404 "no router for requested model". Zero free Kimi remains
     // upstream: OpenRouter lists 9 Kimi variants, all priced
     // (0.00000045..0.0000006 $/tok) with no `:free` suffix on any of them.
     // Kept registered (not deleted) so the pitchfork daemon and the
-    // herd.d/kimi-auto.yaml fragment remain the single source of truth; this
+    // bornite.d/kimi-auto.yaml fragment remain the single source of truth; this
     // comment is the record of why it cannot serve.
     baseUrl: "http://127.0.0.1:25153/v1",
     keyEnv: "KIMI_AUTO_SHIM_KEY",
@@ -116,7 +116,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
   {
     name: "bornite",
     displayName: "Bornite (local VRAM engine)",
-    // :25100 is the estate's LOCAL inference engine (was `herd`): it serves
+    // :25100 is the estate's LOCAL inference engine (was `bornite`): it serves
     // the on-box GGUF fleet over an OpenAI-compatible surface and is the
     // sovereign leg of the routing chain (chalcopyrite :25200 ->
     // rhodochrosite :25193 -> bornite :25100). It was ABSENT from this
@@ -130,30 +130,30 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     seeds: [],
   },
   {
-    name: "hodos",
-    displayName: "Hodos (estate multi-provider gateway)",
-    // hodos :25193 is the estate's multi-provider inference gateway
-    // (pens/olympus/products/hodos, "flock" circuit). It is the FIRST-CLASS
+    name: "rhodochrosite",
+    displayName: "Rhodochrosite (estate multi-provider gateway)",
+    // rhodochrosite :25193 is the estate's multi-provider inference gateway
+    // (pens/olympus/products/rhodochrosite, "flock" circuit). It is the FIRST-CLASS
     // example of the provider -> modelProvider -> model hierarchy: one OVERALL
     // provider owning several distinct SERVING BACKENDS (modelProviders) that
     // may serve overlapping model sets (dupes are valid, keyed by path).
-    // Chain: cuttinggate :25200 -> flock :25193 -> vans.
+    // Chain: chalcopyrite :25200 -> flock :25193 -> vans.
     baseUrl: "http://127.0.0.1:25193/v1",
-    keyEnv: "HODOS_API_KEY",
+    keyEnv: "RHODOCHROSITE_API_KEY",
     auth: "bearer",
     adapter: "none", // gateway itself has no single /models; modelProviders own the surfaces
     seeds: [],
     modelProviders: [
       {
-        name: "cuttinggate",
-        displayName: "CuttingGate :25200",
+        name: "chalcopyrite",
+        displayName: "Chalcopyrite :25200",
         baseUrl: "http://127.0.0.1:25200/v1",
         keyEnv: "CUTTINGGATE_API_KEY",
         auth: "bearer",
         adapter: "openai",
         seeds: [
           // Same super model served by flock too — a VALID dupe across two
-          // modelProviders, disambiguated by path hodos.flock vs hodos.cuttinggate.
+          // modelProviders, disambiguated by path rhodochrosite.flock vs rhodochrosite.chalcopyrite.
           "nvidia/nemotron-3.5-super-vl-120b-a12b",
           "openai/gpt-oss-20b",
         ],
@@ -616,7 +616,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
   {
     // OpenCode Zen free tier (opencode.ai/zen/v1). Client-identity headers
     // (opencode UA + x-opencode-*) are injected by the strategy layer;
-    // see cuttinggate/src/strategy/router_strategy.ts and
+    // see chalcopyrite/src/strategy/router_strategy.ts and
     // estate-scripts-router-ts/router_strategy.ts. Anonymous quota is gated on
     // those headers; Chris-provided OPENCODE_API_KEY via secrets.
     name: "zen",
@@ -1263,7 +1263,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
 /**
  * MODEL_ALIASES — friendly alias → [provider, model] (UX layer).
  *
- * Union of estate-scripts-router-ts CODING and herd codingAlias (see header for
+ * Union of estate-scripts-router-ts CODING and bornite codingAlias (see header for
  * the exclusion rules). Strategy directives and runtime-dynamic local-role
  * aliases stay router-local overlays.
  */

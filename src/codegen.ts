@@ -3,7 +3,7 @@
  * consumers get GENERATED artifacts, never hand-maintained copies.
  *
  * - generated/providers.json — canonical data artifact (Python scripts, docs).
- * - generated/providers.go  — drop-in data file for herd (Go cannot import TS).
+ * - generated/providers.go  — drop-in data file for bornite (Go cannot import TS).
  * - generated/providers.rs  — drop-in data module for flock (Rust cannot import TS).
  * - generated/providers.kappa.json — canonical catalog for the kappa agent (Go+TS);
  *   same catalog shape as providers.json, tagged for kappa so a future kappa
@@ -165,7 +165,7 @@ export function buildProvidersKappaJson(input: CodegenInput): string {
   const providerMap: Record<string, Record<string, unknown>> = {};
 
   for (const d of input.defs) {
-    if (d.enabled === false || d.routerLocal || d.name === "herd") {
+    if (d.enabled === false || d.routerLocal || d.name === "bornite") {
       continue;
     }
     const models: Record<
@@ -192,8 +192,8 @@ export function buildProvidersKappaJson(input: CodegenInput): string {
     let apiKey = "none";
     if (d.name === "flock") {
       apiKey = "!cat /home/toxic/.tau/flock.key";
-    } else if (d.name === "hodos") {
-      apiKey = "herd-local";
+    } else if (d.name === "rhodochrosite") {
+      apiKey = "bornite-local";
     } else if (d.auth !== "none" && d.keyEnv) {
       apiKey = `{env:${d.keyEnv}}`;
     }
@@ -210,7 +210,7 @@ export function buildProvidersKappaJson(input: CodegenInput): string {
 
     // MODEL-PROVIDER LAYER: a provider with modelProviders exposes each
     // distinct serving backend as its own kappa provider keyed
-    // `provider.modelProvider` (e.g. "hodos.flock", "hodos.secure-nim").
+    // `provider.modelProvider` (e.g. "rhodochrosite.flock", "rhodochrosite.secure-nim").
     // The same model id in two modelProviders is a VALID dupe — both entries
     // are emitted, each with its own baseURL/keyEnv. Never deduped.
     if (d.modelProviders && d.modelProviders.length > 0) {
@@ -304,8 +304,8 @@ export function buildInstalledKappaJson(
     if (d.enabled === false || d.routerLocal) return false;
     if (
       d.name === "flock" ||
-      d.name === "herd" ||
-      d.name === "hodos" ||
+      d.name === "bornite" ||
+      d.name === "rhodochrosite" ||
       d.auth === "none"
     ) {
       return true;
@@ -323,11 +323,11 @@ export function buildInstalledKappaJson(
 }
 
 /**
- * Generated Go data file for herd. Package name and exported symbols are
- * chosen to be a drop-in data replacement for herd's hardcoded tables; herd's
+ * Generated Go data file for bornite. Package name and exported symbols are
+ * chosen to be a drop-in data replacement for bornite's hardcoded tables; bornite's
  * own merge/selection LOGIC stays hand-written and reads these tables.
  *
- * The type is CatalogProviderDef (not ProviderDef) — herd's registry.go
+ * The type is CatalogProviderDef (not ProviderDef) — bornite's registry.go
  * already declares ProviderDef for the extended 9Router registry.
  */
 export function buildProvidersGo(input: CodegenInput): string {
@@ -394,7 +394,7 @@ type CatalogProviderDef struct {
 	ModelsPath     string
 	NoModelsReason string
 	NoAuth         bool // auth === "none": no API key needed
-	RouterLocal    bool // TS-router-local concept; herd skips these
+	RouterLocal    bool // TS-router-local concept; bornite skips these
 	Enabled        bool
 }
 
@@ -439,7 +439,7 @@ function rustStrSlice(ids: string[]): string {
 /**
  * Generated Rust data module for flock. Rust cannot import TS, so the
  * provider wire data ships as a checked-in generated module — the same
- * pattern as providers.go for herd (Go).
+ * pattern as providers.go for bornite (Go).
  *
  * The module is DATA ONLY: flock's hand-written providers.rs keeps every
  * operational type and all routing logic, and builds its ProviderDefs from
@@ -582,7 +582,7 @@ export function buildInstalledTauYaml(
   };
   const defs = input.defs.filter((d) => {
     if (d.enabled === false || d.routerLocal) return false;
-    if (d.name === "flock" || d.name === "herd" || d.auth === "none")
+    if (d.name === "flock" || d.name === "bornite" || d.auth === "none")
       return true;
     const pool = keyEnvsOf(d);
     if (pool.length === 0) return true;
@@ -622,7 +622,7 @@ export function buildProvidersTauYaml(input: CodegenInput): string {
     if (
       d.enabled === false ||
       d.routerLocal ||
-      d.name === "herd"
+      d.name === "bornite"
     ) {
       continue;
     }

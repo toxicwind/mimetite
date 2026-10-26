@@ -1,6 +1,6 @@
-# Hodos vs FreeInference — failover & route reality (2026-10-25)
+# Rhodochrosite vs FreeInference — failover & route reality (2026-10-25)
 
-**Scope:** live probe of the hodos merged router (`:25193`) vs the freeinference provider it fronts. Method: real `/v1/models` snapshot + a live completion, key from `~/.tau/hodos.key`. No creds persisted.
+**Scope:** live probe of the rhodochrosite merged router (`:25193`) vs the freeinference provider it fronts. Method: real `/v1/models` snapshot + a live completion, key from `~/.tau/rhodochrosite.key`. No creds persisted.
 
 ## Live state — 555 models, 14 provider flocks, all healthy
 
@@ -17,7 +17,7 @@
 
 `unhealthy: 0`. freeinference is **7 of 555 models** but lowest-latency of the big pools (90ms vs openrouter 504ms).
 
-## freeinference in hodos (`proxy/src/mimetite_providers.rs`)
+## freeinference in rhodochrosite (`proxy/src/mimetite_providers.rs`)
 
 - `base_url: https://freeinference.org/v1`, `key_env: FREEINFERENCE_API_KEY`, adapter `openai`, `enabled: true`.
 - Context lengths: **deepseek-v4-flash = 1,000,000** (also glm-5.3-flash, minimax-m3 at 1M; qwen3.6-35b / diffusiongemma at 262k).
@@ -40,7 +40,7 @@ POST /v1/chat/completions {model:"deepseek-v4-flash"} → HTTP 200, "PONG", 280m
 
 Served through the freeinference lane; proves the fast-path is live end-to-end.
 
-## Surfaces (auth from `~/.tau/hodos.key`)
+## Surfaces (auth from `~/.tau/rhodochrosite.key`)
 
 | Surface | URL | Auth result |
 |---|---|---|
@@ -52,4 +52,4 @@ Served through the freeinference lane; proves the fast-path is live end-to-end.
 ## Bottom line for the "why 160 / failover" question
 
 - freeinference is a **fast, small, 1M-context lane** (7 models / 90ms / deepseek-v4-flash 1M), not the pool. Its value is latency + context, its risk is the 2-concurrency cap.
-- hodos already has the machinery (governor exhaustion + circuit + 14-flock race) to survive a freeinference 429: **failover is structural, not manual.** To read the *quota/history* numbers the task asked for, the admin session credential for `:25193/api/usage/*` is needed — I did not chase it; it's a separate admin surface, not a routing-path concern.
+- rhodochrosite already has the machinery (governor exhaustion + circuit + 14-flock race) to survive a freeinference 429: **failover is structural, not manual.** To read the *quota/history* numbers the task asked for, the admin session credential for `:25193/api/usage/*` is needed — I did not chase it; it's a separate admin surface, not a routing-path concern.

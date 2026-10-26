@@ -23,7 +23,7 @@ const outDir = join(here, "..", "generated");
  * predated the vansrouter/omniroute definitions entirely. The build now
  * writes it, so "DO NOT EDIT BY HAND" is enforced by the generator
  * instead of by convention. Both trees live on the same estate
- * filesystem (hodos is its own repo), so a relative path reaches it.
+ * filesystem (rhodochrosite is its own repo), so a relative path reaches it.
  */
 const FLOCK_RUST_PATHS = [
   resolve(here, "..", "..", "rhodochrosite", "proxy", "src", "roost_providers.rs"),

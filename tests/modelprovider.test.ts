@@ -8,21 +8,21 @@ import { describe, expect, test } from "bun:test";
 import { ModelCatalog } from "../src/catalog.ts";
 import type { ProviderDef } from "../src/types.ts";
 
-// Hermetic fixtures: a hierarchical "hodos" provider with two modelProviders
+// Hermetic fixtures: a hierarchical "rhodochrosite" provider with two modelProviders
 // (flock :25193, secure-NIM) serving an overlapping model; a "freeinference"
 // flat provider (legacy).
 const FIXTURES: ProviderDef[] = [
   {
-    name: "hodos",
+    name: "rhodochrosite",
     adapter: "none",
     baseUrl: "http://127.0.0.1:25193/v1",
-    keyEnv: "HODOS_API_KEY",
+    keyEnv: "RHODOCHROSITE_API_KEY",
     seeds: [],
     modelProviders: [
       {
         name: "flock",
         baseUrl: "http://127.0.0.1:25193/v1",
-        keyEnv: "HODOS_API_KEY",
+        keyEnv: "RHODOCHROSITE_API_KEY",
         adapter: "openai",
         seeds: [
           "nvidia/nemotron-3.5-super-vl-120b-a12b",
@@ -55,17 +55,17 @@ const catalog = new ModelCatalog(FIXTURES);
 describe("provider -> modelProvider -> model", () => {
   test("(a) hierarchical provider resolves its modelProviders each with their own models", () => {
     const rows = catalog.allServingByModelProvider();
-    const hodos = rows.filter((r) => r.provider === "hodos");
-    const flock = hodos
+    const rhodochrosite = rows.filter((r) => r.provider === "rhodochrosite");
+    const flock = rhodochrosite
       .filter((r) => r.modelProvider === "flock")
       .map((r) => r.id);
     expect(flock).toContain("nvidia/nemotron-3.5-super-vl-120b-a12b");
     expect(flock).toContain("meta/llama-3.2-11b-vision-instruct");
-    const secure = hodos
+    const secure = rhodochrosite
       .filter((r) => r.modelProvider === "secure-nim")
       .map((r) => r.id);
     expect(secure).toContain("nvidia/nemotron-3.5-lightning-30b-a3b");
-    expect(new Set(hodos.map((r) => r.modelProvider))).toEqual(
+    expect(new Set(rhodochrosite.map((r) => r.modelProvider))).toEqual(
       new Set(["flock", "secure-nim"]),
     );
   });
@@ -74,7 +74,7 @@ describe("provider -> modelProvider -> model", () => {
     const rows = catalog.allServingByModelProvider();
     const dupe = rows.filter(
       (r) =>
-        r.provider === "hodos" &&
+        r.provider === "rhodochrosite" &&
         r.id === "nvidia/nemotron-3.5-super-vl-120b-a12b",
     );
     // two distinct provider/modelProvider rows, same id, NOT merged

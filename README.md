@@ -17,8 +17,8 @@ hand-maintained copies.
   across all known endpoint shapes, keep the *last successful* listing.
 - **Auto-quarantine** removes dead or vanished models automatically — never
   served, always observable, re-admitted on re-listing.
-- **`provider → modelProvider → model` hierarchy** — one vendor (hodos) can
-  serve through several distinct backends (flock, cuttinggate, secure-NIM),
+- **`provider → modelProvider → model` hierarchy** — one vendor (rhodochrosite) can
+  serve through several distinct backends (flock, chalcopyrite, secure-NIM),
   each with its own URL/key/adapter. Dupes across modelProviders are valid and
   keyed by path, never deduped.
 - **Generated artifacts** for consumers that can't import TS: `providers.go`,
@@ -85,7 +85,7 @@ providers.d/    drop-in `*.json` provider definitions (no data.ts edit required)
 scripts/build.ts  `bun run build` — regenerates generated/ + syncs installed slices
 generated/
   providers.json       canonical JSON artifact (Python consumers), $schema estate-mimetite/v1
-  providers.go         drop-in Go data file for herd (package astmatrix)
+  providers.go         drop-in Go data file for bornite (package astmatrix)
   providers.rs         drop-in Rust data module for flock (MIMETITE_* constants)
   tau-models.yml       canonical YAML model catalog for Tau
   kappa-models.json    canonical Kappa provider config (full profile)
@@ -103,7 +103,7 @@ tests/          tests — adapters, catalog, codegen, concurrency, auto-loader, 
 | --- | --- |
 | provider defs | 47 |
 | enabled providers | 47 |
-| modelProvider carriers | 1 (hodos) |
+| modelProvider carriers | 1 (rhodochrosite) |
 | serving backends | 2 modelProviders, 48 distinct serve-paths |
 | model aliases | 24 |
 | dead model ids | 16 |
@@ -119,7 +119,7 @@ tests/          tests — adapters, catalog, codegen, concurrency, auto-loader, 
    `providers.d/` to register it without touching `data.ts`.
 2. `bun run build` — regenerates `generated/` and syncs the installed slices.
 3. `bun test` — the sync test fails if you forgot step 2 (byte-for-byte diff).
-4. Copy `generated/providers.go` over herd's
+4. Copy `generated/providers.go` over bornite's
    `internal/astmatrix/providers_generated.go` (the test tells you the exact
    path when it's stale).
 
@@ -158,10 +158,10 @@ or catalog logic. Each adapter is total on its input contract and throws
 
 ## `provider → modelProvider → model` (first-class hierarchy)
 
-A top-level **provider** (hodos, freeinference, google, groq) is a vendor or
+A top-level **provider** (rhodochrosite, freeinference, google, groq) is a vendor or
 gateway. It can serve a model set through **one or more distinct serving
-backends** — a **modelProvider** (e.g. hodos owns `flock` :25193,
-`cuttinggate` :25200, `secure-nim`). Each modelProvider carries its own
+backends** — a **modelProvider** (e.g. rhodochrosite owns `flock` :25193,
+`chalcopyrite` :25200, `secure-nim`). Each modelProvider carries its own
 `baseUrl`/`keyEnv`/`adapter` and its own model list — and a provider without
 `modelProviders` resolves at the implicit legacy flat backend (unchanged
 behavior).
@@ -171,8 +171,8 @@ behavior).
 - `ModelCatalog.allServingByModelProvider()` returns every
   `{ provider, modelProvider, id, source }` row, dupes intact.
 - Generated artifacts expose the layer: kappa gets disambiguated provider-map
-  keys (`hodos.flock`, …); tau models.yml and herd/flock artifacts carry the
-  hodos defs.
+  keys (`rhodochrosite.flock`, …); tau models.yml and bornite/flock artifacts carry the
+  rhodochrosite defs.
 
 ## Persistence
 
@@ -198,7 +198,7 @@ touching `src/data.ts`), so stale-artifact drift is a test failure, and the Floc
 Rust consumer copy is written from a single render — no hand-copy drift.
 
 `build.ts` also syncs the Flock Rust data module to
-`../hodos/proxy/src/{roost,mimetite}_providers.rs` and the Flock-proxy copy, and
+`../rhodochrosite/proxy/src/{roost,mimetite}_providers.rs` and the Flock-proxy copy, and
 best-effort syncs `~/.tau/models.yml` / `~/.config/kappa/kappa-models.json` /
 their estate mirrors (skipped gracefully when the estate paths don't exist).
 
@@ -218,7 +218,7 @@ bun test`) through mise; eligible task artifacts restore through mbx-cache.
 | Consumer | How it consumes | Status |
 |---|---|---|
 | **tau** (`toxicwind/tau`) | reads `tau-models.yml` | provider authority for the coding-agent engine |
-| **herd** (Go) | `internal/astmatrix/providers.go` — generated, checked in, never hand-edited; reads the live-catalog export for live sets | Provenance `@toxicwind/mimetite` |
+| **bornite** (Go) | `internal/astmatrix/providers.go` — generated, checked in, never hand-edited; reads the live-catalog export for live sets | Provenance `@toxicwind/mimetite` |
 | **flock** (Rust) | `proxy/src/mimetite_providers.rs` — generated data module, synced by build | wire data only; flock keeps its operational overlay |
 | **kappa** (Go+TS) | `generated/kappa-models.json` (full) + installed slice | two profiles: canonical catalog + env-filtered live config |
 | **Python research scripts** | `generated/providers.json` (canonical) + `*.live.json` (derived) | stable schemas `estate-mimetite/v1` / `live-catalog/v1` |
@@ -228,6 +228,6 @@ bun test`) through mise; eligible task artifacts restore through mbx-cache.
 - [`research/nvcf-vs-integrate.md`](research/nvcf-vs-integrate.md) — entitlement
   truth: Integrate is a thin OpenAI-compat facade over the NVCF function plane;
   `/v1/models` is a lying catalog, entitlement is per-UUID (live-probed 2026-10-25).
-- [`bench-radar/hodos-vs-freeinference.md`](bench-radar/hodos-vs-freeinference.md) —
-  live route reality through the hodos merged router vs the freeinference
+- [`bench-radar/rhodochrosite-vs-freeinference.md`](bench-radar/rhodochrosite-vs-freeinference.md) —
+  live route reality through the rhodochrosite merged router vs the freeinference
   provider it fronts (555 models / 14 flocks, live-probed 2026-10-25).

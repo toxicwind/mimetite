@@ -101,7 +101,7 @@ export declare class ModelCatalog {
     /** Load persisted state. Unknown shape -> empty catalog state, never throws. */
     loadJSON(raw: unknown): void;
     /**
-     * Live catalog export — the ANSWER for non-TS consumers (Go herd, Python).
+     * Live catalog export — the ANSWER for non-TS consumers (Go bornite, Python).
      *
      * This is pure data, not logic: the derived serving sets, quarantine lists,
      * and discovery flags. Consumers read this file to learn what to serve;

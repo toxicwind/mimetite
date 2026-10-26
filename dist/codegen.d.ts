@@ -3,7 +3,7 @@
  * consumers get GENERATED artifacts, never hand-maintained copies.
  *
  * - generated/providers.json — canonical data artifact (Python scripts, docs).
- * - generated/providers.go  — drop-in data file for herd (Go cannot import TS).
+ * - generated/providers.go  — drop-in data file for bornite (Go cannot import TS).
  * - generated/providers.rs  — drop-in data module for flock (Rust cannot import TS).
  * - generated/providers.kappa.json — canonical catalog for the kappa agent (Go+TS);
  *   same catalog shape as providers.json, tagged for kappa so a future kappa
@@ -46,11 +46,11 @@ export declare function buildProvidersKappaJson(input: CodegenInput): string;
  */
 export declare function buildInstalledKappaJson(input: CodegenInput, env?: Record<string, string | undefined>): string;
 /**
- * Generated Go data file for herd. Package name and exported symbols are
- * chosen to be a drop-in data replacement for herd's hardcoded tables; herd's
+ * Generated Go data file for bornite. Package name and exported symbols are
+ * chosen to be a drop-in data replacement for bornite's hardcoded tables; bornite's
  * own merge/selection LOGIC stays hand-written and reads these tables.
  *
- * The type is CatalogProviderDef (not ProviderDef) — herd's registry.go
+ * The type is CatalogProviderDef (not ProviderDef) — bornite's registry.go
  * already declares ProviderDef for the extended 9Router registry.
  */
 export declare function buildProvidersGo(input: CodegenInput): string;

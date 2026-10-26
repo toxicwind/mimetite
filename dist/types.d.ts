@@ -47,7 +47,7 @@ export interface ProviderDef {
     /**
      * True for providers that are concepts of the estate TS router only
      * (local proxies / shims like nim-local and kimi-auto). Other consumers
-     * (herd, TAU, Python) skip these definitions.
+     * (bornite, TAU, Python) skip these definitions.
      */
     routerLocal?: boolean;
     /**
@@ -79,7 +79,7 @@ export interface QuarantineEntry {
 }
 /**
  * Friendly alias → [provider, canonical model id] (UX layer).
- * Both TS routers and herd resolve aliases to a provider+model pair, so the
+ * Both TS routers and bornite resolve aliases to a provider+model pair, so the
  * package owns the pair form. Strategy directives (auto/fcm/free → null in
  * the routers) and runtime-dynamic local-role aliases stay router-local.
  */
@@ -103,7 +103,7 @@ export interface PersistedCatalog {
     updatedAt: string;
 }
 /**
- * Live catalog export — the ANSWER for non-TS consumers (Go herd, Python).
+ * Live catalog export — the ANSWER for non-TS consumers (Go bornite, Python).
  * Pure data: derived serving sets, quarantine lists, discovery flags.
  * Contract: estate-mimetite/live-catalog/v1. Consumers read the serving
  * arrays verbatim; membership logic lives only in the TS package.

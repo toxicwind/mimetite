@@ -3,7 +3,7 @@
  * service, and must not drift from the estate's live ports.
  *
  * Why this test exists (2026-10-25): the catalog carried `omniroute`
- * (a port that died when the service was renamed to hodos), omitted the
+ * (a port that died when the service was renamed to rhodochrosite), omitted the
  * LIVE local engine at :25100 entirely, and nested a `flock` modelProvider
  * pointing at its own parent's URL. Nothing caught any of it: the catalog
  * compiled, the generated artifacts synced, and every test passed while the
@@ -73,8 +73,8 @@ describe("catalog identity — one service, one identity", () => {
 
   test("retired aliases are gone", () => {
     const names = new Set(registeredIdentities().map((i) => i.name));
-    // `omniroute` died when the service was renamed to hodos (:20130).
-    // `flock` was a nested duplicate of hodos' own URL.
+    // `omniroute` died when the service was renamed to rhodochrosite (:20130).
+    // `flock` was a nested duplicate of rhodochrosite' own URL.
     expect(names.has("omniroute")).toBe(false);
     expect(names.has("flock")).toBe(false);
   });

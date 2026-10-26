@@ -23,7 +23,7 @@ type CatalogProviderDef struct {
 	ModelsPath     string
 	NoModelsReason string
 	NoAuth         bool // auth === "none": no API key needed
-	RouterLocal    bool // TS-router-local concept; herd skips these
+	RouterLocal    bool // TS-router-local concept; bornite skips these
 	Enabled        bool
 }
 
@@ -75,9 +75,9 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 		Enabled:        true,
 	},
 	{
-		Name:           "hodos",
+		Name:           "rhodochrosite",
 		BaseURL:        "http://127.0.0.1:25193/v1",
-		KeyEnv:         "HODOS_API_KEY",
+		KeyEnv:         "RHODOCHROSITE_API_KEY",
 		KeyEnvAlt:      "",
 		Adapter:        "none",
 		Auth:           "bearer",
@@ -763,7 +763,7 @@ var ProviderCatalogSeeds = map[string][]string{
 		"kimi-k2-instruct",
 	},
 	"bornite": []string{},
-	"hodos": []string{},
+	"rhodochrosite": []string{},
 	"nvidia": []string{
 		"google/diffusiongemma-26b-a4b-it",
 		"meta/llama-3.2-11b-vision-instruct",
