@@ -127,10 +127,102 @@ async function loadEnvFile(path: string): Promise<Record<string, string>> {
   return env;
 }
 
+/**
+ * The secretsmith keyring is the SSOT (2026-10-18+). `~/.secrets` is a dead
+ * fallback record, so a build that only reads it sees an EMPTY environment
+ * and silently drops every keyring-backed provider from the generated
+ * installed slice — that is how freeinference and nvidia vanished from tau's
+ * models.yml (2026-10-26). Consult the keyring directly, and strip ONE
+ * matching pair of shell quotes (secretsmith env emits KEY='value').
+ */
+async function loadKeyringEnv(): Promise<Record<string, string>> {
+  const env: Record<string, string> = {};
+  try {
+    const proc = Bun.spawnSync(["secretsmith", "env"], {
+      stdout: "pipe",
+      stderr: "ignore",
+      timeout: 30_000,
+    });
+    if (proc.exitCode !== 0) return env;
+    for (const line of new TextDecoder().decode(proc.stdout).split("\n")) {
+      const s = line.trim();
+      if (!s || s.startsWith("#")) continue;
+      const eq = s.indexOf("=");
+      if (eq <= 0) continue;
+      const k = s
+        .slice(0, eq)
+        .trim()
+        .replace(/^export\s+/, "");
+      let v = s.slice(eq + 1).trim();
+      if (
+        (v.startsWith('"') && v.endsWith('"')) ||
+        (v.startsWith("'") && v.endsWith("'"))
+      ) {
+        v = v.slice(1, -1);
+      }
+      if (k) env[k] = v;
+    }
+  } catch {
+    // keyring unavailable (CI) — the file/env fallbacks still apply
+  }
+  return env;
+}
+
+/**
+ * Materialize tau's per-provider key files from the keyring. tau reads
+ * `apiKey: "!cat /home/toxic/.tau/<provider>.key"` so no secret is ever
+ * committed and tau's process needs no keyring env.
+ */
+async function materializeKeyFiles(
+  env: Record<string, string>,
+  pairs: Array<{ file: string; keyEnv: string }>,
+): Promise<void> {
+  for (const { file, keyEnv } of pairs) {
+    const value = env[keyEnv];
+    if (!value) continue;
+    try {
+      await Bun.write(file, value + "\n");
+      // Bun.write's `mode` only applies at creation and is ignored for
+      // existing files — chmod explicitly so key files are 0600 (they were
+      // landing 0644 = world-readable secrets).
+      await Bun.$`chmod 600 ${file}`.quiet();
+    } catch (e) {
+      console.warn(`skip key file ${file}: ${(e as Error).message}`);
+    }
+  }
+}
+
 const installedEnv = {
   ...(await loadEnvFile("/home/toxic/.tau/.env")),
   ...(await loadEnvFile("/home/toxic/.secrets")),
+  ...(await loadKeyringEnv()),
 };
+
+// Materialize tau's per-provider key files from the keyring (idempotent,
+// 0600). tau's process is not keyring-injected, and the committed
+// models.yml must not carry inline secrets.
+const keyFilePairs: Array<{ file: string; keyEnv: string }> = [];
+for (const def of PROVIDER_DEFS as Array<{
+  name: string;
+  keyEnv?: string;
+  keyEnvAlt?: string;
+  modelProviders?: Array<{ name: string; keyEnv?: string }>;
+}>) {
+  const slug = (id: string) => id.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  if (def.keyEnv)
+    keyFilePairs.push({
+      file: `/home/toxic/.tau/${slug(def.name)}.key`,
+      keyEnv: def.keyEnv,
+    });
+  for (const mp of def.modelProviders ?? []) {
+    if (mp.keyEnv)
+      keyFilePairs.push({
+        file: `/home/toxic/.tau/${slug(`${def.name}.${mp.name}`)}.key`,
+        keyEnv: mp.keyEnv,
+      });
+  }
+}
+await materializeKeyFiles(installedEnv, keyFilePairs);
 const installed = buildInstalledTauYaml(
   {
     defs: PROVIDER_DEFS,

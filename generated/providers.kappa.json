@@ -256,6 +256,23 @@
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash"
     ],
+    "openrouter": [
+      "qwen/qwen3.8-27b:free",
+      "poolside/laguna-xs-2.1:free",
+      "google/gemma-4-31b-it:free",
+      "nvidia/nemotron-3-super-120b-a12b:free",
+      "inclusionai/ling-3.0-flash-fin:free",
+      "google/gemma-4-26b-a4b-it:free",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "nvidia/nemotron-nano-12b-v2-vl:free",
+      "nvidia/nemotron-nano-9b-v2:free",
+      "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "poolside/laguna-s-2.1:free",
+      "cohere/north-mini-code:free",
+      "inclusionai/ling-3.0-flash:free",
+      "x-ai/grok-4.5",
+      "x-ai/grok-4.6"
+    ],
     "together": [
       "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
@@ -821,7 +838,7 @@
       "name": "Rhodochrosite (estate multi-provider gateway) / Chalcopyrite :25200",
       "options": {
         "baseURL": "http://127.0.0.1:25200/v1",
-        "apiKey": "{env:CUTTINGGATE_API_KEY}"
+        "apiKey": "{env:CHALCOPYRITE_CLIENT_KEY}"
       },
       "models": {
         "nvidia/nemotron-3-super-120b-a12b": {
@@ -1611,6 +1628,121 @@
           "name": "z-ai/glm-5.3-flash",
           "limit": {
             "context": 128000,
+            "output": 8192
+          }
+        }
+      }
+    },
+    "openrouter": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "OpenRouter",
+      "options": {
+        "baseURL": "https://openrouter.ai/api/v1",
+        "apiKey": "{env:OPENROUTER_API_KEY}"
+      },
+      "models": {
+        "qwen/qwen3.8-27b:free": {
+          "name": "qwen/qwen3.8-27b:free",
+          "limit": {
+            "context": 128000,
+            "output": 8192
+          }
+        },
+        "poolside/laguna-xs-2.1:free": {
+          "name": "poolside/laguna-xs-2.1:free",
+          "limit": {
+            "context": 256000,
+            "output": 8192
+          }
+        },
+        "google/gemma-4-31b-it:free": {
+          "name": "google/gemma-4-31b-it:free",
+          "limit": {
+            "context": 1000000,
+            "output": 8192
+          }
+        },
+        "nvidia/nemotron-3-super-120b-a12b:free": {
+          "name": "nvidia/nemotron-3-super-120b-a12b:free",
+          "limit": {
+            "context": 500000,
+            "output": 8192
+          }
+        },
+        "inclusionai/ling-3.0-flash-fin:free": {
+          "name": "inclusionai/ling-3.0-flash-fin:free",
+          "limit": {
+            "context": 256000,
+            "output": 8192
+          }
+        },
+        "google/gemma-4-26b-a4b-it:free": {
+          "name": "google/gemma-4-26b-a4b-it:free",
+          "limit": {
+            "context": 1000000,
+            "output": 8192
+          }
+        },
+        "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": {
+          "name": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+          "limit": {
+            "context": 256000,
+            "output": 8192
+          }
+        },
+        "nvidia/nemotron-nano-12b-v2-vl:free": {
+          "name": "nvidia/nemotron-nano-12b-v2-vl:free",
+          "limit": {
+            "context": 256000,
+            "output": 8192
+          }
+        },
+        "nvidia/nemotron-nano-9b-v2:free": {
+          "name": "nvidia/nemotron-nano-9b-v2:free",
+          "limit": {
+            "context": 256000,
+            "output": 8192
+          }
+        },
+        "nvidia/nemotron-3-ultra-550b-a55b:free": {
+          "name": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "limit": {
+            "context": 1000000,
+            "output": 8192
+          }
+        },
+        "poolside/laguna-s-2.1:free": {
+          "name": "poolside/laguna-s-2.1:free",
+          "limit": {
+            "context": 256000,
+            "output": 8192
+          }
+        },
+        "cohere/north-mini-code:free": {
+          "name": "cohere/north-mini-code:free",
+          "limit": {
+            "context": 128000,
+            "output": 8192
+          }
+        },
+        "inclusionai/ling-3.0-flash:free": {
+          "name": "inclusionai/ling-3.0-flash:free",
+          "limit": {
+            "context": 256000,
+            "output": 8192
+          }
+        },
+        "x-ai/grok-4.5": {
+          "name": "x-ai/grok-4.5",
+          "limit": {
+            "context": 2000000,
+            "output": 8192
+          }
+        },
+        "x-ai/grok-4.6": {
+          "name": "x-ai/grok-4.6",
+          "limit": {
+            "context": 2000000,
             "output": 8192
           }
         }
@@ -5157,9 +5289,9 @@
       "name": "rhodochrosite",
       "displayName": "Rhodochrosite (estate multi-provider gateway)",
       "baseUrl": "http://127.0.0.1:25193/v1",
-      "keyEnv": "RHODOCHROSITE_API_KEY",
+      "keyEnv": "FLOCK_API_KEY",
       "keyEnvs": [
-        "RHODOCHROSITE_API_KEY"
+        "FLOCK_API_KEY"
       ],
       "adapter": "none",
       "auth": "bearer",
@@ -5167,7 +5299,7 @@
         {
           "name": "chalcopyrite",
           "baseUrl": "http://127.0.0.1:25200/v1",
-          "keyEnv": "CUTTINGGATE_API_KEY",
+          "keyEnv": "CHALCOPYRITE_CLIENT_KEY",
           "adapter": "openai",
           "auth": "bearer",
           "seeds": [
@@ -5267,6 +5399,17 @@
       "keyEnv": "WANDB_API_KEY",
       "keyEnvs": [
         "WANDB_API_KEY"
+      ],
+      "adapter": "openai",
+      "auth": "bearer"
+    },
+    {
+      "name": "openrouter",
+      "displayName": "OpenRouter",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "keyEnv": "OPENROUTER_API_KEY",
+      "keyEnvs": [
+        "OPENROUTER_API_KEY"
       ],
       "adapter": "openai",
       "auth": "bearer"

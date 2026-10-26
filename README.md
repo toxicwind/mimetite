@@ -101,14 +101,14 @@ tests/          tests — adapters, catalog, codegen, concurrency, auto-loader, 
 
 | Fact | Value |
 | --- | --- |
-| provider defs | 47 |
-| enabled providers | 47 |
+| provider defs | 48 |
+| enabled providers | 48 |
 | modelProvider carriers | 1 (rhodochrosite) |
-| serving backends | 2 modelProviders, 48 distinct serve-paths |
+| serving backends | 2 modelProviders, 49 distinct serve-paths |
 | model aliases | 24 |
 | dead model ids | 16 |
 | endpoint adapters | 5 (openai, mistral, google-v1beta, static, none) |
-| tests | 99 across tests/*.test.ts |
+| tests | 101 across tests/*.test.ts |
 
 <!-- FACTS:END -->
 

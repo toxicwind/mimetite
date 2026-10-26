@@ -643,7 +643,7 @@ var PROVIDER_DEFS = [
     name: "rhodochrosite",
     displayName: "Rhodochrosite (estate multi-provider gateway)",
     baseUrl: "http://127.0.0.1:25193/v1",
-    keyEnv: "RHODOCHROSITE_API_KEY",
+    keyEnv: "FLOCK_API_KEY",
     auth: "bearer",
     adapter: "none",
     seeds: [],
@@ -652,7 +652,7 @@ var PROVIDER_DEFS = [
         name: "chalcopyrite",
         displayName: "Chalcopyrite :25200",
         baseUrl: "http://127.0.0.1:25200/v1",
-        keyEnv: "CUTTINGGATE_API_KEY",
+        keyEnv: "CHALCOPYRITE_CLIENT_KEY",
         auth: "bearer",
         adapter: "openai",
         seeds: [
@@ -886,6 +886,48 @@ var PROVIDER_DEFS = [
     contextLengths: {
       "grok-4.5": 2000000,
       "grok-4.6": 2000000
+    }
+  },
+  {
+    name: "openrouter",
+    displayName: "OpenRouter",
+    baseUrl: "https://openrouter.ai/api/v1",
+    keyEnv: "OPENROUTER_API_KEY",
+    auth: "bearer",
+    adapter: "openai",
+    seeds: [
+      "qwen/qwen3.8-27b:free",
+      "poolside/laguna-xs-2.1:free",
+      "google/gemma-4-31b-it:free",
+      "nvidia/nemotron-3-super-120b-a12b:free",
+      "inclusionai/ling-3.0-flash-fin:free",
+      "google/gemma-4-26b-a4b-it:free",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "nvidia/nemotron-nano-12b-v2-vl:free",
+      "nvidia/nemotron-nano-9b-v2:free",
+      "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "poolside/laguna-s-2.1:free",
+      "cohere/north-mini-code:free",
+      "inclusionai/ling-3.0-flash:free",
+      "x-ai/grok-4.5",
+      "x-ai/grok-4.6"
+    ],
+    contextLengths: {
+      "cohere/north-mini-code:free": 128000,
+      "google/gemma-4-26b-a4b-it:free": 1e6,
+      "google/gemma-4-31b-it:free": 1e6,
+      "inclusionai/ling-3.0-flash-fin:free": 256000,
+      "inclusionai/ling-3.0-flash:free": 256000,
+      "nvidia/nemotron-3-nano-30b-a3b:free": 256000,
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 256000,
+      "nvidia/nemotron-3-super-120b-a12b:free": 500000,
+      "nvidia/nemotron-3-ultra-550b-a55b:free": 1e6,
+      "nvidia/nemotron-nano-12b-v2-vl:free": 256000,
+      "nvidia/nemotron-nano-9b-v2:free": 256000,
+      "poolside/laguna-s-2.1:free": 256000,
+      "poolside/laguna-xs-2.1:free": 256000,
+      "x-ai/grok-4.5": 2000000,
+      "x-ai/grok-4.6": 2000000
     }
   },
   {
@@ -2238,6 +2280,10 @@ pub const ROOST_DEAD_IDS: &[&str] = MIMETITE_DEAD_IDS;
 pub const ROOST_ALIASES: &[(&str, &str, &str)] = MIMETITE_ALIASES;
 `;
 }
+function tauKeyRef(providerId) {
+  const slug = providerId.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  return `"!cat /home/toxic/.tau/${slug}.key"`;
+}
 function buildInstalledTauYaml(input, env) {
   const present = (name) => {
     if (!name)
@@ -2295,7 +2341,7 @@ function buildProvidersTauYaml(input) {
         if (mp.auth === "none") {
           lines.push(`    auth: none`);
         } else if (mp.keyEnv) {
-          lines.push(`    apiKey: ${mp.keyEnv}`);
+          lines.push(`    apiKey: ${tauKeyRef(`${d.name}.${mp.name}`)}`);
         }
         if (mp.adapter === "openai") {
           lines.push(`    discovery:`);
@@ -2318,7 +2364,7 @@ function buildProvidersTauYaml(input) {
     if (d.auth === "none") {
       lines.push(`    auth: none`);
     } else if (d.keyEnv) {
-      lines.push(`    apiKey: ${d.keyEnv}`);
+      lines.push(`    apiKey: ${tauKeyRef(d.name)}`);
     }
     if (d.adapter !== "none" && d.adapter !== "static") {
       lines.push(`    discovery:`);

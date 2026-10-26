@@ -1,6 +1,6 @@
 {
   "schema": "routes-contract/1",
-  "generatedAt": "2026-10-26T21:32:29.712Z",
+  "generatedAt": "2026-10-26T22:49:34.641Z",
   "provenance": "@toxicwind/mimetite src/data.ts",
   "directives": {
     "lanes": [
@@ -53,7 +53,7 @@
       "baseUrl": "http://127.0.0.1:25200/v1",
       "api": "openai-completions",
       "auth": "bearer",
-      "keyEnv": "CUTTINGGATE_API_KEY",
+      "keyEnv": "CHALCOPYRITE_CLIENT_KEY",
       "seeds": [
         "nvidia/nemotron-3-super-120b-a12b",
         "openai/gpt-oss-20b"
@@ -299,6 +299,37 @@
         "openai/gpt-oss-20b",
         "poolside/laguna-xs-2.1",
         "z-ai/glm-5.3-flash"
+      ],
+      "healthPath": "/models",
+      "healthOk": [
+        200,
+        401
+      ],
+      "probePath": "/chat/completions"
+    },
+    {
+      "provider": "openrouter",
+      "modelProvider": null,
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "api": "openai-completions",
+      "auth": "bearer",
+      "keyEnv": "OPENROUTER_API_KEY",
+      "seeds": [
+        "qwen/qwen3.8-27b:free",
+        "poolside/laguna-xs-2.1:free",
+        "google/gemma-4-31b-it:free",
+        "nvidia/nemotron-3-super-120b-a12b:free",
+        "inclusionai/ling-3.0-flash-fin:free",
+        "google/gemma-4-26b-a4b-it:free",
+        "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "nvidia/nemotron-nano-12b-v2-vl:free",
+        "nvidia/nemotron-nano-9b-v2:free",
+        "nvidia/nemotron-3-ultra-550b-a55b:free",
+        "poolside/laguna-s-2.1:free",
+        "cohere/north-mini-code:free",
+        "inclusionai/ling-3.0-flash:free",
+        "x-ai/grok-4.5",
+        "x-ai/grok-4.6"
       ],
       "healthPath": "/models",
       "healthOk": [

@@ -567,6 +567,17 @@ pub const ROOST_ALIASES: &[(&str, &str, &str)] = MIMETITE_ALIASES;
 `;
 }
 
+/**
+ * Tau reads secrets from a per-provider key FILE, never from its own
+ * environment: the generated models.yml is COMMITTED (estate/config/tau), so
+ * an inline secret would leak, and tau's process is not keyring-injected.
+ * The build materializes ~/.tau/<provider>.key from the keyring.
+ */
+export function tauKeyRef(providerId: string): string {
+  const slug = providerId.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  return `"!cat /home/toxic/.tau/${slug}.key"`;
+}
+
 /** Tau install slice: local routers and unkeyed static catalogs stay.
  *  A provider with a keyEnv is omitted unless that variable (or keyEnvAlt)
  *  is non-empty in env. The checked-in generated/ artifact stays the full
@@ -638,7 +649,7 @@ export function buildProvidersTauYaml(input: CodegenInput): string {
         if (mp.auth === "none") {
           lines.push(`    auth: none`);
         } else if (mp.keyEnv) {
-          lines.push(`    apiKey: ${mp.keyEnv}`);
+          lines.push(`    apiKey: ${tauKeyRef(`${d.name}.${mp.name}`)}`);
         }
         if (mp.adapter === "openai") {
           lines.push(`    discovery:`);
@@ -660,7 +671,7 @@ export function buildProvidersTauYaml(input: CodegenInput): string {
     if (d.auth === "none") {
       lines.push(`    auth: none`);
     } else if (d.keyEnv) {
-      lines.push(`    apiKey: ${d.keyEnv}`);
+      lines.push(`    apiKey: ${tauKeyRef(d.name)}`);
     }
     if (d.adapter !== "none" && d.adapter !== "static") {
       lines.push(`    discovery:`);

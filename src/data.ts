@@ -143,7 +143,12 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     // keyed by path).
     // Chain: chalcopyrite :25200 -> rhodochrosite :25193 -> vans.
     baseUrl: "http://127.0.0.1:25193/v1",
-    keyEnv: "RHODOCHROSITE_API_KEY",
+    // The gateway's client key lives in the keyring under the continuity
+    // name FLOCK_API_KEY (the "flock" product name predates the rename to
+    // rhodochrosite; ~/.tau/flock.key + FLOCK_API_KEY keep it stable).
+    // RHODOCHROSITE_API_KEY never existed in the keyring — using it left
+    // the lane unauthenticated (tau 401 "Invalid JWT serialization").
+    keyEnv: "FLOCK_API_KEY",
     auth: "bearer",
     adapter: "none", // gateway itself has no single /models; modelProviders own the surfaces
     seeds: [],
@@ -152,7 +157,10 @@ export const PROVIDER_DEFS: ProviderDef[] = [
         name: "chalcopyrite",
         displayName: "Chalcopyrite :25200",
         baseUrl: "http://127.0.0.1:25200/v1",
-        keyEnv: "CUTTINGGATE_API_KEY",
+        // Renamed with the product: cuttinggate -> atlas -> chalcopyrite.
+        // The keyring label is CHALCOPYRITE_CLIENT_KEY; CUTTINGGATE_API_KEY
+        // no longer exists anywhere, so this lane always 401'd.
+        keyEnv: "CHALCOPYRITE_CLIENT_KEY",
         auth: "bearer",
         adapter: "openai",
         seeds: [
@@ -411,6 +419,53 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     contextLengths: {
       "grok-4.5": 2000000,
       "grok-4.6": 2000000,
+    },
+  },
+  {
+    name: "openrouter",
+    displayName: "OpenRouter",
+    baseUrl: "https://openrouter.ai/api/v1",
+    keyEnv: "OPENROUTER_API_KEY",
+    auth: "bearer",
+    adapter: "openai",
+    // Reachable set (live /v1/models/user 2026-10-26) + the 2M pair. The
+    // 2M-context handoff premise needs a model that can HOLD a 2M-token
+    // context: x-ai/grok-4.5|4.6 declare 2,000,000 windows (the bare
+    // "grok-4.5" ids previously parked on the wandb def were never servable
+    // — the real ids carry the x-ai/ prefix).
+    seeds: [
+      "qwen/qwen3.8-27b:free",
+      "poolside/laguna-xs-2.1:free",
+      "google/gemma-4-31b-it:free",
+      "nvidia/nemotron-3-super-120b-a12b:free",
+      "inclusionai/ling-3.0-flash-fin:free",
+      "google/gemma-4-26b-a4b-it:free",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "nvidia/nemotron-nano-12b-v2-vl:free",
+      "nvidia/nemotron-nano-9b-v2:free",
+      "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "poolside/laguna-s-2.1:free",
+      "cohere/north-mini-code:free",
+      "inclusionai/ling-3.0-flash:free",
+      "x-ai/grok-4.5",
+      "x-ai/grok-4.6",
+    ],
+    contextLengths: {
+      "cohere/north-mini-code:free": 128000,
+      "google/gemma-4-26b-a4b-it:free": 1000000,
+      "google/gemma-4-31b-it:free": 1000000,
+      "inclusionai/ling-3.0-flash-fin:free": 256000,
+      "inclusionai/ling-3.0-flash:free": 256000,
+      "nvidia/nemotron-3-nano-30b-a3b:free": 256000,
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": 256000,
+      "nvidia/nemotron-3-super-120b-a12b:free": 500000,
+      "nvidia/nemotron-3-ultra-550b-a55b:free": 1000000,
+      "nvidia/nemotron-nano-12b-v2-vl:free": 256000,
+      "nvidia/nemotron-nano-9b-v2:free": 256000,
+      "poolside/laguna-s-2.1:free": 256000,
+      "poolside/laguna-xs-2.1:free": 256000,
+      "x-ai/grok-4.5": 2000000,
+      "x-ai/grok-4.6": 2000000,
     },
   },
   {
