@@ -82,17 +82,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     auth: "none",
     adapter: "static",
     staticModels: ["kimi-auto"],
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -162,16 +168,27 @@ export const PROVIDER_DEFS: ProviderDef[] = [
         // no longer exists anywhere, so this lane always 401'd.
         keyEnv: "CHALCOPYRITE_CLIENT_KEY",
         auth: "bearer",
-        adapter: "openai",
+        // STATIC chat-only cards: chalcopyrite's live discovery also exposes
+        // NON-chat ids (dots-studio/*-preview, longcat-*-preview) and tau
+        // happily picks one as the default -> 422 "Expected union value" on a
+        // chat request. Curated cards keep only chat models visible.
+        adapter: "static",
         seeds: [
-          // Same super model served by the gateway too — a VALID dupe across
-          // modelProviders, disambiguated by path rhodochrosite vs rhodochrosite.chalcopyrite.
-          // OpenRouter id (ver. 3.5 retired there per models/user, 2026-10-26):
-          // "nemotron-3-super-120b-a12b" is the reachable current id. secure-nim
-          // keeps nemotron-3.5-super-vl-120b-a12b (NVIDIA integrate API serves it).
-          "nvidia/nemotron-3-super-120b-a12b",
+          // Observed 2026-10-26 against chalcopyrite :25200: the ids below
+          // answer 200 on the chat surface. REMOVED: nvidia/nemotron-3-super-
+          // 120b-a12b -> 404 "Function not found" (entitlement-dead; it was the
+          // 404 that stalled every tau turn) and every dots-studio/* id —
+          // those are NOTE-PREVIEW models (422 "Expected union value" on a
+          // chat request), not chat models.
+          "nvidia/nemotron-3.5-lightning-30b-a3b",
+          "nvidia/nemotron-3-ultra-550b-a55b",
           "openai/gpt-oss-20b",
         ],
+        contextLengths: {
+          "nvidia/nemotron-3.5-lightning-30b-a3b": 1048576,
+          "nvidia/nemotron-3-ultra-550b-a55b": 1048576,
+          "openai/gpt-oss-20b": 131072,
+        },
       },
       {
         name: "secure-nim",
@@ -179,11 +196,35 @@ export const PROVIDER_DEFS: ProviderDef[] = [
         baseUrl: "https://integrate.api.nvidia.com/v1",
         keyEnv: "NVIDIA_API_KEY",
         auth: "bearer",
-        adapter: "openai",
+        // STATIC cards, not live discovery: NIM publishes no context lengths,
+        // so discovery yields window-less cards (the compaction/thinking-loop
+        // flail). Both ids observed 200 (2524ms / 276ms).
+        adapter: "static",
         seeds: [
           "nvidia/nemotron-3.5-super-vl-120b-a12b",
           "nvidia/nemotron-3.5-lightning-30b-a3b",
         ],
+        contextLengths: {
+          "nvidia/nemotron-3.5-super-vl-120b-a12b": 1048576,
+          "nvidia/nemotron-3.5-lightning-30b-a3b": 1048576,
+        },
+      },
+      {
+        name: "azurite",
+        displayName: "Azurite (gemini-flash-tool-retrieval only)",
+        // Exactly ONE card: the EAP interactions surface carries gemini-flash-
+        // tool-retrieval (the estate/theta tool-retrieval lane). Surfaced here
+        // so tau's modelRoles can pin `rhodochrosite.azurite/models/gemini-
+        // flash-tool-retrieval` without exposing the rest of the google
+        // family on the rhodochrosite menu.
+        baseUrl: "http://127.0.0.1:25109/gemini-eap-interactions",
+        keyEnv: "",
+        auth: "none",
+        adapter: "static",
+        seeds: ["models/gemini-flash-tool-retrieval"],
+        contextLengths: {
+          "models/gemini-flash-tool-retrieval": 1000000,
+        },
       },
     ],
   },
@@ -205,29 +246,45 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     // across all account keys, 7 return real completions). The
     // removed seeds are entitlement-gated (404 "Function not found
     // for account") or dead/hanging on every key.
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
     ],
+    // NIM publishes NO context lengths in /v1/models (every entry is null),
+    // so blind discovery hands tau a card with no window -> sessions
+    // "overflow" -> compaction loop -> "thinking loop detected" -> narrative
+    // surrender. These are the card windows (NIM reference docs + the
+    // observed picker values), pinned here as STATIC cards.
     contextLengths: {
-      "deepseek-ai/deepseek-v4.1-flash": 256000,
+      "meta/llama-3.2-11b-vision-instruct": 131072,
+      "meta/muse-glimmer-30b": 131072,
+      "nvidia/ising-calibration-1.5-31b": 131072,
       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning": 256000,
-      "nvidia/nemotron-3-super-120b-a12b": 262144,
       "nvidia/nemotron-3-ultra-550b-a55b": 1048576,
+      "nvidia/nemotron-3.5-bolt-e4b": 256000,
+      "nvidia/nemotron-3.5-content-safety": 131072,
       "nvidia/nemotron-3.5-lightning-30b-a3b": 1048576,
+      "nvidia/nemotron-3.5-super-vl-120b-a12b": 1048576,
+      "nvidia/nemotron-parse-2.0": 131072,
       "openai/gpt-oss-20b": 131072,
-      "z-ai/glm-5.3": 200000,
+      "poolside/laguna-xs-2.1": 131072,
       "z-ai/glm-5.3-flash": 200000,
     },
   },
@@ -237,17 +294,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "GROQ_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -268,17 +331,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     // /v1/models 401s without a key (verified live 2026-09-30) — real endpoint.
     // Seeds from Bitdeer's own docs (developers.bitdeer.ai) + community spot
     // checks. Catalog: GLM, Kimi, Qwen, MiniMax, Nemotron, DeepSeek, MiMo.
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -290,17 +359,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "CEREBRAS_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -317,17 +392,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "OPENAI_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -346,17 +427,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "DEEPSEEK_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -373,22 +460,33 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     baseUrl: "https://freeinference.org/v1",
     keyEnv: "FREEINFERENCE_API_KEY",
     auth: "bearer",
-    adapter: "openai",
-    // Verified live 2026-10-13: keyed GET /v1/models returns these 6;
-    // chat completions 200 on qwen3.6-35b. bge-m3 is embeddings-only
-    // so it stays out of chat seeds.
+    // STATIC cards (verified live 2026-10-27T05:32Z: keyed GET /v1/models
+    // returns 5 ids in 0.24s; bge-m3 is embeddings-only so it stays out).
+    // Was adapter:"openai" discovery-only — tau's model picker showed
+    // "freeinference · 0 models / Discovery failed: The operation timed out"
+    // whenever the live /models poll missed, leaving the lane unusable.
+    // Stale seeds removed: minimax-m3 (now minimax-m3.1-flash), diffusiongemma
+    // (no longer served).
+    adapter: "static",
     seeds: [
       "glm-5.3-flash",
-      "minimax-m3",
+      "minimax-m3.1-flash",
       "qwen3.6-35b",
-      "diffusiongemma",
+      "deepseek-v4-flash",
+    ],
+    // The tau codegen emits `models:` from staticModels (NOT seeds) — without
+    // this the provider surfaces with zero selectable models whenever live
+    // /models discovery misses ("Discovery failed: The operation timed out").
+    staticModels: [
+      "glm-5.3-flash",
+      "minimax-m3.1-flash",
+      "qwen3.6-35b",
       "deepseek-v4-flash",
     ],
     contextLengths: {
       "glm-5.3-flash": 1000000,
-      "minimax-m3": 1000000,
+      "minimax-m3.1-flash": 1048576,
       "qwen3.6-35b": 262000,
-      diffusiongemma: 262000,
       "deepseek-v4-flash": 1000000,
     },
   },
@@ -401,17 +499,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     adapter: "openai",
     // /v1/models 401s without a key (verified live 2026-09-30) — serverless
     // inference, $100/mo free-credit tier per free-llm-api-hub. Seeds empty.
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -474,17 +578,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "TOGETHER_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -500,17 +610,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "DEEPINFRA_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -530,17 +646,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     adapter: "openai",
     // /v1/models lists WITHOUT a key (verified live 2026-09-30); completions
     // need a key. Seeds are the live no-auth listing.
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -552,17 +674,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "SILICONFLOW_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -574,17 +702,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "NOVITA_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -596,17 +730,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "VENICE_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -618,17 +758,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "AIMLAPI_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -640,17 +786,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "BASETEN_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -662,17 +814,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "ZAI_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -689,17 +847,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "OPENCODE_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -711,17 +875,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "SYNTHETIC_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -733,17 +903,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "WAFER_SERVERLESS_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -755,17 +931,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "QIANFAN_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -777,17 +959,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "GMI_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -801,17 +989,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnvAlt: "FUGU_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -825,17 +1019,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnvAlt: "ABLIT_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -850,17 +1050,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     adapter: "openai",
     // /v1/models 401s without a key (verified live 2026-09-30) — decentralized
     // GPU compute (Bittensor), OpenAI-compatible. Seeds empty until keyed.
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -873,17 +1079,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "AWS_BEARER_TOKEN_BEDROCK",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -896,17 +1108,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "OLLAMA_CLOUD_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -921,17 +1139,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     adapter: "openai",
     // /compatibility/v1/models 401s without a key (verified live 2026-09-30).
     // Command model IDs are Cohere's stable OpenAI-compat slugs.
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -946,17 +1170,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnvAlt: "COMMANDCODE_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -969,17 +1199,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "SINGULARITYAPI_DEV_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -995,17 +1231,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     // /api/v1/models 401s without a key (verified live 2026-09-30) — free
     // experimental endpoint (announced 2026-07-24, experiments.hetzner.com).
     // Model list unknowable without a key; seeds empty per cold-start contract.
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -1058,17 +1300,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "GITHUB_TOKEN",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -1083,17 +1331,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     adapter: "openai",
     // /v1/models 401s without a key (verified live 2026-09-30) — serverless
     // GPU deployments, OpenAI-compatible. Seeds empty until keyed.
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -1109,17 +1363,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     keyEnv: "DASHSCOPE_API_KEY",
     auth: "bearer",
     adapter: "openai",
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -1134,17 +1394,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     adapter: "openai",
     // /v1/models lists WITHOUT a key (verified live 2026-10-02); EU-hosted,
     // three latency tiers. Seeds are the live no-auth listing.
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -1159,17 +1425,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     adapter: "openai",
     // /v1/models lists WITHOUT a key (verified live 2026-10-02, 125 models);
     // aggregator-style gateway with gateway-side failover.
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -1184,17 +1456,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     adapter: "openai",
     // /v1/models 401s without a key (verified live 2026-10-02); 500+ models
     // claimed. Seeds empty until keyed.
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -1209,17 +1487,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     adapter: "openai",
     // /v1/models 401s without a key (verified live 2026-10-02); multimodal
     // serverless (chat+image+video+embeddings). Seeds empty until keyed.
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -1234,17 +1518,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     adapter: "openai",
     // /v1/models lists WITHOUT a key (verified live 2026-10-02, 137 models);
     // AI gateway with LLM routing. Seeds are flagship chat IDs from the live listing.
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -1258,17 +1548,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     auth: "bearer",
     adapter: "openai",
     // /v1/models lists WITHOUT a key (verified live 2026-10-02, 15 proprietary onde-* models).
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -1282,17 +1578,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     auth: "bearer",
     adapter: "openai",
     // /v1/models 401s without a key (verified live 2026-10-02). Seeds empty until keyed.
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
@@ -1307,17 +1609,23 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     adapter: "openai",
     // Catch-up flagged by sweep-2: predates the window but verified alive 2026-10-02;
     // /v1/models lists WITHOUT a key (mercury-2, mercury-2.5).
+    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
+    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
+    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
+    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
+    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
+    // is the exact 404 class that stalled the estate's agent fleet).
     seeds: [
-      "google/diffusiongemma-26b-a4b-it",
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
       "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-super-120b-a12b",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "nvidia/nemotron-3.5-bolt-e4b",
       "nvidia/nemotron-3.5-content-safety",
       "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
-      "nvidia/riva-translate-4b-instruct-v1.1",
-      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
       "poolside/laguna-xs-2.1",
       "z-ai/glm-5.3-flash",
