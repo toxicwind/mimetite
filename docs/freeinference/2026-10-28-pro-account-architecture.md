@@ -311,3 +311,8 @@ Would you like to generate a production-ready Python script to automate asynchro
 | Dashboard (auth) | quota remaining: $97.21 of $160.00 (as of export) | quota-aware scheduling input |
 
 **Hard rules from dossier:** JWT encodes `role:"pro"` (uid 01M2CZNVZ3DY4G10AE7PTT71EE); build d55dab6 (2026-10-27) doubled pro ceiling $80→$160/day; fake user agents get BANNED — rhodochrosite must always forward caller UA or a real desktop UA; quota exhaustion emails: admin@freeinference.org.
+
+
+## Route contract addendum (argon PoC3 probe, 2026-10-28)
+- `/v1/models`: 200 live (glm-5.3-flash fp8 1M-ctx verified).
+- `/anthropic/v1/messages`: **404 structured model-not-found** — anthropic-compat lane EXISTS; `gemini-4-argon` NOT served. Front-door-alive vs exec-lane (anomaly #5 pattern): live lane with a model gap, not a dead route.
