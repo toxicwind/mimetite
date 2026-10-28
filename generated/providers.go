@@ -757,19 +757,7 @@ var ProviderCatalogDefs = []CatalogProviderDef{
 // catalog filters deadIds everywhere (cold start included).
 var ProviderCatalogSeeds = map[string][]string{
 	"kimi-auto": []string{
-		"meta/llama-3.2-11b-vision-instruct",
-		"meta/muse-glimmer-30b",
-		"nvidia/ising-calibration-1.5-31b",
-		"nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-		"nvidia/nemotron-3-ultra-550b-a55b",
-		"nvidia/nemotron-3.5-bolt-e4b",
-		"nvidia/nemotron-3.5-content-safety",
-		"nvidia/nemotron-3.5-lightning-30b-a3b",
-		"nvidia/nemotron-3.5-super-vl-120b-a12b",
-		"nvidia/nemotron-parse-2.0",
-		"openai/gpt-oss-20b",
-		"poolside/laguna-xs-2.1",
-		"z-ai/glm-5.3-flash",
+		"kimi-auto",
 	},
 	"moonshot": []string{
 		"moonshot-v1-8k",
@@ -1457,7 +1445,7 @@ var ProviderCatalogAliases = map[string][2]string{
 	"nim-mistral-large-3":   {"nvidia", "mistralai/mistral-large-3-675b-instruct-2512"},
 	"nim-nemotron-nano":     {"nvidia", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"},
 	"nim-nemotron-omni":     {"nvidia", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"},
-	"nim-nemotron-super":    {"nvidia", "nvidia/nemotron-3-super-120b-a12b"},
+	"nim-nemotron-super":    {"nvidia", "nvidia/nemotron-3.5-super-vl-120b-a12b"},
 	"nim-qwen3.5-122b":      {"nvidia", "qwen/qwen3.5-122b-a10b"},
 	"nim-qwen3.5-397b":      {"nvidia", "qwen/qwen3.5-397b-a17b"},
 }

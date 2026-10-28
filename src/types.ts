@@ -76,7 +76,10 @@ export interface ProviderDef {
    * `providers.<name>.maxConcurrency` are tau-side). Absent = no cap.
    */
   maxConcurrency?: number;
-
+  /** Custom User-Agent header sent on upstream requests. */
+  userAgent?: string;
+  /** Max retries for requests to this provider before circuit tripping or failing over. */
+  retryCeiling?: number;
   /**
    * Per-model standalone overrides (2026-10-28 model-sovereignty): every
    * model on every provider is independently configurable WITHOUT code
@@ -147,6 +150,17 @@ export interface ModelProviderDef {
   /** Router-local only (local proxies/shim); other consumers skip it. */
   routerLocal?: boolean;
   enabled?: boolean;
+  maxConcurrency?: number;
+  userAgent?: string;
+  retryCeiling?: number;
+  extraHeaders?: Record<string, string>;
+  modelOverrides?: Record<string, {
+    temperature?: number;
+    maxTokens?: number;
+    effort?: "low" | "medium" | "high";
+    maxConcurrency?: number;
+    headers?: Record<string, string>;
+  }>;
 }
 
 export interface DiscoveredModels {

@@ -58,7 +58,7 @@ pub const MIMETITE_PROVIDERS: &[PinaxProvider] = &[
         models_path: "",
         router_local: true,
         enabled: true,
-        seeds: &["meta/llama-3.2-11b-vision-instruct", "meta/muse-glimmer-30b", "nvidia/ising-calibration-1.5-31b", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning", "nvidia/nemotron-3-ultra-550b-a55b", "nvidia/nemotron-3.5-bolt-e4b", "nvidia/nemotron-3.5-content-safety", "nvidia/nemotron-3.5-lightning-30b-a3b", "nvidia/nemotron-3.5-super-vl-120b-a12b", "nvidia/nemotron-parse-2.0", "openai/gpt-oss-20b", "poolside/laguna-xs-2.1", "z-ai/glm-5.3-flash"],
+        seeds: &["kimi-auto"],
         static_models: &["kimi-auto"],
         context_lengths: &[],
     },
@@ -234,7 +234,7 @@ pub const MIMETITE_PROVIDERS: &[PinaxProvider] = &[
     },
     PinaxProvider {
         name: "wandb",
-        display_name: "W&B Inference",
+        display_name: "wandb",
         base_url: "https://api.inference.wandb.ai/v1",
         key_env: "WANDB_API_KEY",
         key_env_alt: "",
@@ -890,7 +890,7 @@ pub const MIMETITE_ALIASES: &[(&str, &str, &str)] = &[
     ("nim-mistral-large-3", "nvidia", "mistralai/mistral-large-3-675b-instruct-2512"),
     ("nim-nemotron-nano", "nvidia", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"),
     ("nim-nemotron-omni", "nvidia", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"),
-    ("nim-nemotron-super", "nvidia", "nvidia/nemotron-3-super-120b-a12b"),
+    ("nim-nemotron-super", "nvidia", "nvidia/nemotron-3.5-super-vl-120b-a12b"),
     ("nim-qwen3.5-122b", "nvidia", "qwen/qwen3.5-122b-a10b"),
     ("nim-qwen3.5-397b", "nvidia", "qwen/qwen3.5-397b-a17b"),
 ];

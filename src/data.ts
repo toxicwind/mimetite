@@ -82,27 +82,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     auth: "none",
     adapter: "static",
     staticModels: ["kimi-auto"],
-    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
-    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
-    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
-    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
-    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
-    // is the exact 404 class that stalled the estate's agent fleet).
-    seeds: [
-      "meta/llama-3.2-11b-vision-instruct",
-      "meta/muse-glimmer-30b",
-      "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-      "nvidia/nemotron-3-ultra-550b-a55b",
-      "nvidia/nemotron-3.5-bolt-e4b",
-      "nvidia/nemotron-3.5-content-safety",
-      "nvidia/nemotron-3.5-lightning-30b-a3b",
-      "nvidia/nemotron-3.5-super-vl-120b-a12b",
-      "nvidia/nemotron-parse-2.0",
-      "openai/gpt-oss-20b",
-      "poolside/laguna-xs-2.1",
-      "z-ai/glm-5.3-flash",
-    ],
+    seeds: ["kimi-auto"],
     routerLocal: true,
   },
   {
@@ -489,10 +469,25 @@ export const PROVIDER_DEFS: ProviderDef[] = [
       "qwen3.6-35b": 262000,
       "deepseek-v4-flash": 1000000,
     },
+    maxConcurrency: 2,
+    userAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    retryCeiling: 3,
+    extraHeaders: {
+      "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    },
+    modelOverrides: {
+      "deepseek-v4-flash": {
+        maxConcurrency: 1,
+        temperature: 0.2,
+      },
+      "glm-5.3-flash": {
+        maxConcurrency: 1,
+        temperature: 0.2,
+      },
+    },
   },
   {
     name: "wandb",
-    displayName: "W&B Inference",
     baseUrl: "https://api.inference.wandb.ai/v1",
     keyEnv: "WANDB_API_KEY",
     auth: "bearer",
@@ -843,31 +838,38 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     // estate-scripts-router-ts/router_strategy.ts. Anonymous quota is gated on
     // those headers; Chris-provided OPENCODE_API_KEY via secrets.
     name: "zen",
+    displayName: "opencode zen (free tier)",
     baseUrl: "https://opencode.ai/zen/v1",
     keyEnv: "OPENCODE_API_KEY",
     auth: "bearer",
     adapter: "openai",
-    // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
-    // every id below returned HTTP 200. Removed: google/diffusiongemma-26b-a4b-it
-    // and deepseek-ai/deepseek-v4.1-flash (timeout at 25s) and
-    // nvidia/nemotron-3-super-120b-a12b -> 404 "Function ... not found"
-    // (entitlement-dead; it was seeded here AND in the chalcopyrite lane and
-    // is the exact 404 class that stalled the estate's agent fleet).
-    seeds: [
-      "meta/llama-3.2-11b-vision-instruct",
-      "meta/muse-glimmer-30b",
-      "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-      "nvidia/nemotron-3-ultra-550b-a55b",
-      "nvidia/nemotron-3.5-bolt-e4b",
-      "nvidia/nemotron-3.5-content-safety",
-      "nvidia/nemotron-3.5-lightning-30b-a3b",
-      "nvidia/nemotron-3.5-super-vl-120b-a12b",
-      "nvidia/nemotron-parse-2.0",
-      "openai/gpt-oss-20b",
-      "poolside/laguna-xs-2.1",
-      "z-ai/glm-5.3-flash",
+    // Dynamic client identity (2026-10-27): the strategy layer materializes
+    // the opencode UA + x-opencode-* headers from this flag — no hardcoded
+    // provider-name check remains in the routers.
+    clientIdentity: "opencode",
+    // 2026-10-27 (architect flag): seeds were clobbered by a mass sweep
+    // pasting the NVIDIA entitlement-audit list here — zen serves NONE of
+    // those ids (guaranteed 404 "no router for requested model", the same
+    // pathology the kimi-auto comment records). Restored the verified
+    // 2026-10-04 free-tier catalog from the deleted router-local overlay:
+    // 45 upstream models, 11 free-tier. Verified against
+    // https://opencode.ai/zen/v1/models AND via router WITH response-model
+    // check — the router fails over on miss, so HTTP 200 alone does NOT
+    // prove the model served.
+    staticModels: [
+      "big-pickle",
+      "fledge-alpha-free",
+      "jev-1.13-free",
+      "ling-3.1-flash-free",
+      "longcat-2.5-preview-free",
+      "mimo-v2.5-free",
+      "mimo-v2.6-flash-free",
+      "muse-spark-1.2-contributor-free",
+      "muse-spark-1.3-contributor-free",
+      "nemotron-3.5-lightning-free",
+      "space-bunny-free",
     ],
+    seeds: ["mimo-v2.5-free", "mimo-v2.6-flash-free", "ling-3.1-flash-free"],
   },
   {
     name: "synthetic",
@@ -1668,7 +1670,7 @@ export function resolveContext(
  */
 export const MODEL_ALIASES: Record<string, ModelAlias> = {
   "nemotron-nano": ["nvidia", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"],
-  "nim-nemotron-super": ["nvidia", "nvidia/nemotron-3-super-120b-a12b"],
+  "nim-nemotron-super": ["nvidia", "nvidia/nemotron-3.5-super-vl-120b-a12b"],
   "nim-nemotron-omni": [
     "nvidia",
     "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",

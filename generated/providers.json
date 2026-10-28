@@ -174,6 +174,9 @@
       ],
       "adapter": "static",
       "auth": "bearer",
+      "extraHeaders": {
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+      },
       "staticModels": [
         "glm-5.3-flash",
         "minimax-m3.1-flash",
@@ -183,7 +186,6 @@
     },
     {
       "name": "wandb",
-      "displayName": "W&B Inference",
       "baseUrl": "https://api.inference.wandb.ai/v1",
       "keyEnv": "WANDB_API_KEY",
       "keyEnvs": [
@@ -606,19 +608,7 @@
   ],
   "seeds": {
     "kimi-auto": [
-      "meta/llama-3.2-11b-vision-instruct",
-      "meta/muse-glimmer-30b",
-      "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-      "nvidia/nemotron-3-ultra-550b-a55b",
-      "nvidia/nemotron-3.5-bolt-e4b",
-      "nvidia/nemotron-3.5-content-safety",
-      "nvidia/nemotron-3.5-lightning-30b-a3b",
-      "nvidia/nemotron-3.5-super-vl-120b-a12b",
-      "nvidia/nemotron-parse-2.0",
-      "openai/gpt-oss-20b",
-      "poolside/laguna-xs-2.1",
-      "z-ai/glm-5.3-flash"
+      "kimi-auto"
     ],
     "moonshot": [
       "moonshot-v1-8k",
@@ -1266,7 +1256,7 @@
     ],
     "nim-nemotron-super": [
       "nvidia",
-      "nvidia/nemotron-3-super-120b-a12b"
+      "nvidia/nemotron-3.5-super-vl-120b-a12b"
     ],
     "nim-nemotron-omni": [
       "nvidia",
