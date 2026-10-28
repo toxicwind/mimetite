@@ -1171,25 +1171,26 @@ var PROVIDER_DEFS = [
   },
   {
     name: "zen",
+    displayName: "opencode zen (free tier)",
     baseUrl: "https://opencode.ai/zen/v1",
     keyEnv: "OPENCODE_API_KEY",
     auth: "bearer",
     adapter: "openai",
-    seeds: [
-      "meta/llama-3.2-11b-vision-instruct",
-      "meta/muse-glimmer-30b",
-      "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-      "nvidia/nemotron-3-ultra-550b-a55b",
-      "nvidia/nemotron-3.5-bolt-e4b",
-      "nvidia/nemotron-3.5-content-safety",
-      "nvidia/nemotron-3.5-lightning-30b-a3b",
-      "nvidia/nemotron-3.5-super-vl-120b-a12b",
-      "nvidia/nemotron-parse-2.0",
-      "openai/gpt-oss-20b",
-      "poolside/laguna-xs-2.1",
-      "z-ai/glm-5.3-flash"
-    ]
+    clientIdentity: "opencode",
+    staticModels: [
+      "big-pickle",
+      "fledge-alpha-free",
+      "jev-1.13-free",
+      "ling-3.1-flash-free",
+      "longcat-2.5-preview-free",
+      "mimo-v2.5-free",
+      "mimo-v2.6-flash-free",
+      "muse-spark-1.2-contributor-free",
+      "muse-spark-1.3-contributor-free",
+      "nemotron-3.5-lightning-free",
+      "space-bunny-free"
+    ],
+    seeds: ["mimo-v2.5-free", "mimo-v2.6-flash-free", "ling-3.1-flash-free"]
   },
   {
     name: "synthetic",
@@ -2384,6 +2385,15 @@ function buildProvidersTauYaml(input) {
             lines.push(`      - id: ${id}`);
             if (ctx)
               lines.push(`        contextWindow: ${ctx}`);
+            const mpOv = mp.modelOverrides?.[id];
+            if (mpOv) {
+              if (mpOv.maxConcurrency !== undefined)
+                lines.push(`        maxConcurrency: ${mpOv.maxConcurrency}`);
+              if (mpOv.temperature !== undefined)
+                lines.push(`        temperature: ${mpOv.temperature}`);
+              if (mpOv.maxTokens !== undefined)
+                lines.push(`        maxTokens: ${mpOv.maxTokens}`);
+            }
           }
         }
       }
@@ -2407,6 +2417,22 @@ function buildProvidersTauYaml(input) {
         lines.push(`      - id: ${id}`);
         if (ctx)
           lines.push(`        contextWindow: ${ctx}`);
+        const ov = d.modelOverrides?.[id];
+        if (ov) {
+          if (ov.temperature !== undefined)
+            lines.push(`        temperature: ${ov.temperature}`);
+          if (ov.maxTokens !== undefined)
+            lines.push(`        maxTokens: ${ov.maxTokens}`);
+          if (ov.maxConcurrency !== undefined)
+            lines.push(`        maxConcurrency: ${ov.maxConcurrency}`);
+          if (ov.effort)
+            lines.push(`        effort: ${ov.effort}`);
+          if (ov.headers) {
+            lines.push(`        headers:`);
+            for (const [k, v] of Object.entries(ov.headers))
+              lines.push(`          ${k}: ${v}`);
+          }
+        }
       }
     }
   }

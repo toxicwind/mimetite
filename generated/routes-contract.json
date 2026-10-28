@@ -1,6 +1,6 @@
 {
   "schema": "routes-contract/1",
-  "generatedAt": "2026-10-27T23:48:17.505Z",
+  "generatedAt": "2026-10-28T03:20:24.116Z",
   "provenance": "@toxicwind/mimetite src/data.ts",
   "directives": {
     "lanes": [
@@ -624,19 +624,9 @@
       "auth": "bearer",
       "keyEnv": "OPENCODE_API_KEY",
       "seeds": [
-        "meta/llama-3.2-11b-vision-instruct",
-        "meta/muse-glimmer-30b",
-        "nvidia/ising-calibration-1.5-31b",
-        "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-        "nvidia/nemotron-3-ultra-550b-a55b",
-        "nvidia/nemotron-3.5-bolt-e4b",
-        "nvidia/nemotron-3.5-content-safety",
-        "nvidia/nemotron-3.5-lightning-30b-a3b",
-        "nvidia/nemotron-3.5-super-vl-120b-a12b",
-        "nvidia/nemotron-parse-2.0",
-        "openai/gpt-oss-20b",
-        "poolside/laguna-xs-2.1",
-        "z-ai/glm-5.3-flash"
+        "mimo-v2.5-free",
+        "mimo-v2.6-flash-free",
+        "ling-3.1-flash-free"
       ],
       "healthPath": "/models",
       "healthOk": [

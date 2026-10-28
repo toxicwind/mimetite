@@ -660,6 +660,14 @@ export function buildProvidersTauYaml(input: CodegenInput): string {
             const ctx = mp.contextLengths?.[id];
             lines.push(`      - id: ${id}`);
             if (ctx) lines.push(`        contextWindow: ${ctx}`);
+            // Per-model overrides (model-sovereignty 2026-10-28): every
+            // model independently configurable without code changes.
+            const mpOv = mp.modelOverrides?.[id];
+            if (mpOv) {
+              if (mpOv.maxConcurrency !== undefined) lines.push(`        maxConcurrency: ${mpOv.maxConcurrency}`);
+              if (mpOv.temperature !== undefined) lines.push(`        temperature: ${mpOv.temperature}`);
+              if (mpOv.maxTokens !== undefined) lines.push(`        maxTokens: ${mpOv.maxTokens}`);
+            }
           }
         }
       }
@@ -685,6 +693,19 @@ export function buildProvidersTauYaml(input: CodegenInput): string {
         const ctx = d.contextLengths?.[id];
         lines.push(`      - id: ${id}`);
         if (ctx) lines.push(`        contextWindow: ${ctx}`);
+        // Per-model standalone overrides (model-sovereignty 2026-10-28):
+        // every model independently configurable without code changes.
+        const ov = d.modelOverrides?.[id];
+        if (ov) {
+          if (ov.temperature !== undefined) lines.push(`        temperature: ${ov.temperature}`);
+          if (ov.maxTokens !== undefined) lines.push(`        maxTokens: ${ov.maxTokens}`);
+          if (ov.maxConcurrency !== undefined) lines.push(`        maxConcurrency: ${ov.maxConcurrency}`);
+          if (ov.effort) lines.push(`        effort: ${ov.effort}`);
+          if (ov.headers) {
+            lines.push(`        headers:`);
+            for (const [k, v] of Object.entries(ov.headers)) lines.push(`          ${k}: ${v}`);
+          }
+        }
       }
     }
   }

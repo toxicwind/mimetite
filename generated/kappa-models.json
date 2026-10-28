@@ -3,7 +3,7 @@
   "contract": "estate-mimetite/kappa-catalog/v1",
   "generator": "@toxicwind/mimetite codegen — kappa target (full profile) — DO NOT EDIT BY HAND",
   "provenance": "@toxicwind/mimetite src/data.ts",
-  "generatedAt": "2026-10-26T22:49:42.000Z",
+  "generatedAt": "2026-10-27T23:49:15.000Z",
   "deadIds": [
     "llama-3.3-70b-versatile",
     "meta-llama/llama-3.1-8b-instruct",
@@ -408,19 +408,9 @@
       "z-ai/glm-5.3-flash"
     ],
     "zen": [
-      "meta/llama-3.2-11b-vision-instruct",
-      "meta/muse-glimmer-30b",
-      "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-      "nvidia/nemotron-3-ultra-550b-a55b",
-      "nvidia/nemotron-3.5-bolt-e4b",
-      "nvidia/nemotron-3.5-content-safety",
-      "nvidia/nemotron-3.5-lightning-30b-a3b",
-      "nvidia/nemotron-3.5-super-vl-120b-a12b",
-      "nvidia/nemotron-parse-2.0",
-      "openai/gpt-oss-20b",
-      "poolside/laguna-xs-2.1",
-      "z-ai/glm-5.3-flash"
+      "mimo-v2.5-free",
+      "mimo-v2.6-flash-free",
+      "ling-3.1-flash-free"
     ],
     "synthetic": [
       "meta/llama-3.2-11b-vision-instruct",
@@ -2675,98 +2665,84 @@
     },
     "zen": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "zen",
+      "name": "opencode zen (free tier)",
       "options": {
         "baseURL": "https://opencode.ai/zen/v1",
         "apiKey": "{env:OPENCODE_API_KEY}"
       },
       "models": {
-        "meta/llama-3.2-11b-vision-instruct": {
-          "name": "meta/llama-3.2-11b-vision-instruct",
+        "big-pickle": {
+          "name": "big-pickle",
           "limit": {
             "context": 128000,
             "output": 8192
           }
         },
-        "meta/muse-glimmer-30b": {
-          "name": "meta/muse-glimmer-30b",
+        "fledge-alpha-free": {
+          "name": "fledge-alpha-free",
           "limit": {
             "context": 128000,
             "output": 8192
           }
         },
-        "nvidia/ising-calibration-1.5-31b": {
-          "name": "nvidia/ising-calibration-1.5-31b",
+        "jev-1.13-free": {
+          "name": "jev-1.13-free",
           "limit": {
             "context": 128000,
             "output": 8192
           }
         },
-        "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning": {
-          "name": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+        "ling-3.1-flash-free": {
+          "name": "ling-3.1-flash-free",
           "limit": {
             "context": 128000,
             "output": 8192
           }
         },
-        "nvidia/nemotron-3-ultra-550b-a55b": {
-          "name": "nvidia/nemotron-3-ultra-550b-a55b",
+        "longcat-2.5-preview-free": {
+          "name": "longcat-2.5-preview-free",
           "limit": {
             "context": 128000,
             "output": 8192
           }
         },
-        "nvidia/nemotron-3.5-bolt-e4b": {
-          "name": "nvidia/nemotron-3.5-bolt-e4b",
+        "mimo-v2.5-free": {
+          "name": "mimo-v2.5-free",
           "limit": {
             "context": 128000,
             "output": 8192
           }
         },
-        "nvidia/nemotron-3.5-content-safety": {
-          "name": "nvidia/nemotron-3.5-content-safety",
+        "mimo-v2.6-flash-free": {
+          "name": "mimo-v2.6-flash-free",
           "limit": {
             "context": 128000,
             "output": 8192
           }
         },
-        "nvidia/nemotron-3.5-lightning-30b-a3b": {
-          "name": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "muse-spark-1.2-contributor-free": {
+          "name": "muse-spark-1.2-contributor-free",
           "limit": {
             "context": 128000,
             "output": 8192
           }
         },
-        "nvidia/nemotron-3.5-super-vl-120b-a12b": {
-          "name": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+        "muse-spark-1.3-contributor-free": {
+          "name": "muse-spark-1.3-contributor-free",
           "limit": {
             "context": 128000,
             "output": 8192
           }
         },
-        "nvidia/nemotron-parse-2.0": {
-          "name": "nvidia/nemotron-parse-2.0",
+        "nemotron-3.5-lightning-free": {
+          "name": "nemotron-3.5-lightning-free",
           "limit": {
             "context": 128000,
             "output": 8192
           }
         },
-        "openai/gpt-oss-20b": {
-          "name": "openai/gpt-oss-20b",
-          "limit": {
-            "context": 128000,
-            "output": 8192
-          }
-        },
-        "poolside/laguna-xs-2.1": {
-          "name": "poolside/laguna-xs-2.1",
-          "limit": {
-            "context": 128000,
-            "output": 8192
-          }
-        },
-        "z-ai/glm-5.3-flash": {
-          "name": "z-ai/glm-5.3-flash",
+        "space-bunny-free": {
+          "name": "space-bunny-free",
           "limit": {
             "context": 128000,
             "output": 8192
@@ -5551,13 +5527,27 @@
     },
     {
       "name": "zen",
+      "displayName": "opencode zen (free tier)",
       "baseUrl": "https://opencode.ai/zen/v1",
       "keyEnv": "OPENCODE_API_KEY",
       "keyEnvs": [
         "OPENCODE_API_KEY"
       ],
       "adapter": "openai",
-      "auth": "bearer"
+      "auth": "bearer",
+      "staticModels": [
+        "big-pickle",
+        "fledge-alpha-free",
+        "jev-1.13-free",
+        "ling-3.1-flash-free",
+        "longcat-2.5-preview-free",
+        "mimo-v2.5-free",
+        "mimo-v2.6-flash-free",
+        "muse-spark-1.2-contributor-free",
+        "muse-spark-1.3-contributor-free",
+        "nemotron-3.5-lightning-free",
+        "space-bunny-free"
+      ]
     },
     {
       "name": "synthetic",

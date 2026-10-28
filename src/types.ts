@@ -78,6 +78,30 @@ export interface ProviderDef {
   maxConcurrency?: number;
 
   /**
+   * Per-model standalone overrides (2026-10-28 model-sovereignty): every
+   * model on every provider is independently configurable WITHOUT code
+   * changes. Emitted per-model into tau models.yml (`overrides:` block) and
+   * kappa-models.json. 429s are limiter sheds (never strike); vanished
+   * models (402/404/410) breaker 12h via the geode decay classes.
+   */
+  modelOverrides?: Record<string, {
+    temperature?: number;
+    maxTokens?: number;
+    effort?: "low" | "medium" | "high";
+    headers?: Record<string, string>;
+  }>;
+
+  /**
+   * Client-identity class the strategy layer must materialize per request
+   * (2026-10-27, architect: make the former hardcoded `provider === "zen"`
+   * opencode UA/x-opencode-* fingerprint DYNAMIC — it now travels with the
+   * SSOT def, so any provider declaring the free-tier identity gets the
+   * same header treatment without a router code change).
+   * "opencode" = opencode UA + x-opencode-* headers (zen anonymous quota).
+   */
+  clientIdentity?: "opencode";
+
+  /**
    * MODEL PROVIDERS (1..N) under this OVERALL provider.
    *
    * A provider is a vendor/gateway (rhodochrosite, freeinference, google). It can
