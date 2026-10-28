@@ -181,7 +181,10 @@ async function materializeKeyFiles(
     const value = env[keyEnv];
     if (!value) continue;
     try {
-      await Bun.write(file, value + "\n");
+      // NO trailing newline: tau reads this file with `!cat` straight into an
+      // Authorization header, and a trailing \n corrupts the credential
+      // ("Invalid JWT serialization: Missing dot delimiter(s)").
+      await Bun.write(file, value.trim());
       // Bun.write's `mode` only applies at creation and is ignored for
       // existing files — chmod explicitly so key files are 0600 (they were
       // landing 0644 = world-readable secrets).

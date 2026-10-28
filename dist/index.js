@@ -599,21 +599,7 @@ var PROVIDER_DEFS = [
     auth: "none",
     adapter: "static",
     staticModels: ["kimi-auto"],
-    seeds: [
-      "meta/llama-3.2-11b-vision-instruct",
-      "meta/muse-glimmer-30b",
-      "nvidia/ising-calibration-1.5-31b",
-      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-      "nvidia/nemotron-3-ultra-550b-a55b",
-      "nvidia/nemotron-3.5-bolt-e4b",
-      "nvidia/nemotron-3.5-content-safety",
-      "nvidia/nemotron-3.5-lightning-30b-a3b",
-      "nvidia/nemotron-3.5-super-vl-120b-a12b",
-      "nvidia/nemotron-parse-2.0",
-      "openai/gpt-oss-20b",
-      "poolside/laguna-xs-2.1",
-      "z-ai/glm-5.3-flash"
-    ],
+    seeds: ["kimi-auto"],
     routerLocal: true
   },
   {
@@ -890,11 +876,24 @@ var PROVIDER_DEFS = [
       "minimax-m3.1-flash": 1048576,
       "qwen3.6-35b": 262000,
       "deepseek-v4-flash": 1e6
+    },
+    maxConcurrency: 16,
+    userAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    retryCeiling: 3,
+    extraHeaders: {
+      "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+    },
+    modelOverrides: {
+      "deepseek-v4-flash": {
+        temperature: 0.2
+      },
+      "glm-5.3-flash": {
+        temperature: 0.2
+      }
     }
   },
   {
     name: "wandb",
-    displayName: "W&B Inference",
     baseUrl: "https://api.inference.wandb.ai/v1",
     keyEnv: "WANDB_API_KEY",
     auth: "bearer",
@@ -1790,7 +1789,7 @@ function resolveContext(modelId) {
 }
 var MODEL_ALIASES = {
   "nemotron-nano": ["nvidia", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"],
-  "nim-nemotron-super": ["nvidia", "nvidia/nemotron-3-super-120b-a12b"],
+  "nim-nemotron-super": ["nvidia", "nvidia/nemotron-3.5-super-vl-120b-a12b"],
   "nim-nemotron-omni": [
     "nvidia",
     "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"

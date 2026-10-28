@@ -469,7 +469,10 @@ export const PROVIDER_DEFS: ProviderDef[] = [
       "qwen3.6-35b": 262000,
       "deepseek-v4-flash": 1000000,
     },
-    maxConcurrency: 2,
+    // 2026-10-28 architect order: TAKE ALL LANES — no concurrency cap. A 429
+    // with retry-after is a local limiter shed, not provider truth (anomaly #4:
+    // single-lane observer effect was probe-serialization, not provider law).
+    maxConcurrency: 16,
     userAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
     retryCeiling: 3,
     extraHeaders: {
@@ -477,11 +480,9 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     },
     modelOverrides: {
       "deepseek-v4-flash": {
-        maxConcurrency: 1,
         temperature: 0.2,
       },
       "glm-5.3-flash": {
-        maxConcurrency: 1,
         temperature: 0.2,
       },
     },
