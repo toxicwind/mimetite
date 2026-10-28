@@ -440,6 +440,12 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     baseUrl: "https://freeinference.org/v1",
     keyEnv: "FREEINFERENCE_API_KEY",
     auth: "bearer",
+    // Quota-aware scheduling (2026-10-28): pro plan = $160/day (JWT role:pro,
+    // build d55dab6), tracked live by keypool GET :25109/quota (UTC-midnight
+    // reset). Routers consult dailyBudgetCents before assigning long agent
+    // loops; keypool /quota is the authoritative remaining-cents source.
+    dailyBudgetCents: 16000,
+    quotaSource: "http://127.0.0.1:25109/quota",
     // STATIC cards (verified live 2026-10-27T05:32Z: keyed GET /v1/models
     // returns 5 ids in 0.24s; bge-m3 is embeddings-only so it stays out).
     // Was adapter:"openai" discovery-only — tau's model picker showed
