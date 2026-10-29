@@ -1,6 +1,6 @@
 {
   "$schema": "estate-mimetite/v1",
-  "generatedAt": "2026-10-28T13:12:58.000Z",
+  "generatedAt": "2026-10-28T22:19:05.000Z",
   "generator": "@toxicwind/mimetite codegen — DO NOT EDIT BY HAND",
   "provenance": "@toxicwind/mimetite src/data.ts",
   "adapters": [
@@ -179,7 +179,6 @@
       },
       "staticModels": [
         "glm-5.3-flash",
-        "minimax-m3.1-flash",
         "qwen3.6-35b",
         "deepseek-v4-flash"
       ]
@@ -710,7 +709,6 @@
     ],
     "freeinference": [
       "glm-5.3-flash",
-      "minimax-m3.1-flash",
       "qwen3.6-35b",
       "deepseek-v4-flash"
     ],

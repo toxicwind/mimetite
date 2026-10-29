@@ -1,6 +1,6 @@
 {
   "schema": "routes-contract/1",
-  "generatedAt": "2026-10-28T20:25:36.125Z",
+  "generatedAt": "2026-10-29T00:27:06.218Z",
   "provenance": "@toxicwind/mimetite src/data.ts",
   "directives": {
     "lanes": [
@@ -284,7 +284,6 @@
       "keyEnv": "FREEINFERENCE_API_KEY",
       "seeds": [
         "glm-5.3-flash",
-        "minimax-m3.1-flash",
         "qwen3.6-35b",
         "deepseek-v4-flash"
       ],

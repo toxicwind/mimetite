@@ -858,22 +858,21 @@ var PROVIDER_DEFS = [
     baseUrl: "https://freeinference.org/v1",
     keyEnv: "FREEINFERENCE_API_KEY",
     auth: "bearer",
+    dailyBudgetCents: 16000,
+    quotaSource: "http://127.0.0.1:25109/quota",
     adapter: "static",
     seeds: [
       "glm-5.3-flash",
-      "minimax-m3.1-flash",
       "qwen3.6-35b",
       "deepseek-v4-flash"
     ],
     staticModels: [
       "glm-5.3-flash",
-      "minimax-m3.1-flash",
       "qwen3.6-35b",
       "deepseek-v4-flash"
     ],
     contextLengths: {
       "glm-5.3-flash": 1e6,
-      "minimax-m3.1-flash": 1048576,
       "qwen3.6-35b": 262000,
       "deepseek-v4-flash": 1e6
     },

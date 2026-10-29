@@ -18,6 +18,7 @@ import {
   buildInstalledTauYaml,
   buildProvidersTauYaml,
   emitAll,
+  tauKeyRef,
 } from "../src/codegen.ts";
 import type { CodegenInput } from "../src/codegen.ts";
 import type { ProviderDef } from "../src/types.ts";
@@ -241,7 +242,9 @@ describe("tau-models.yml", () => {
     });
     expect(yml).toContain("testgw.backend-a:");
     expect(yml).toContain("testgw.backend-b:");
-    expect(yml).toContain("apiKey: BACKEND_A_KEY");
+    // Three-tier backends emit the tauKeyRef keyring materialization
+    // (`~/.tau/<slug>.key`), never a raw keyEnv (inline-secret leak guard).
+    expect(yml).toContain(`apiKey: ${tauKeyRef("testgw.backend-a")}`);
     expect(yml).toContain("auth: none");
     expect(yml).toContain("- id: m2");
     expect(yml).toContain("contextWindow: 8192");

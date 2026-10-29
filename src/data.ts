@@ -446,17 +446,17 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     // loops; keypool /quota is the authoritative remaining-cents source.
     dailyBudgetCents: 16000,
     quotaSource: "http://127.0.0.1:25109/quota",
-    // STATIC cards (verified live 2026-10-27T05:32Z: keyed GET /v1/models
-    // returns 5 ids in 0.24s; bge-m3 is embeddings-only so it stays out).
+    // STATIC cards (re-verified 2026-10-28T00:4xZ: keyed GET /v1/models and one
+    // chat probe per id. minimax-m3.1-flash AND minimax-m3 both 404
+    // "Model not found" at serve time — removed from this def entirely
+    // (serve-404 class, anomaly-quarantine doctrine). bge-m3 is
+    // embeddings-only so it stays out.
     // Was adapter:"openai" discovery-only — tau's model picker showed
     // "freeinference · 0 models / Discovery failed: The operation timed out"
     // whenever the live /models poll missed, leaving the lane unusable.
-    // Stale seeds removed: minimax-m3 (now minimax-m3.1-flash), diffusiongemma
-    // (no longer served).
     adapter: "static",
     seeds: [
       "glm-5.3-flash",
-      "minimax-m3.1-flash",
       "qwen3.6-35b",
       "deepseek-v4-flash",
     ],
@@ -465,13 +465,11 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     // /models discovery misses ("Discovery failed: The operation timed out").
     staticModels: [
       "glm-5.3-flash",
-      "minimax-m3.1-flash",
       "qwen3.6-35b",
       "deepseek-v4-flash",
     ],
     contextLengths: {
       "glm-5.3-flash": 1000000,
-      "minimax-m3.1-flash": 1048576,
       "qwen3.6-35b": 262000,
       "deepseek-v4-flash": 1000000,
     },
@@ -484,6 +482,26 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     extraHeaders: {
       "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
     },
+    // VERIFIED 2026-10-28 gateway header contract (all probes 200):
+    // - X-API-Key / api-key: raw hyi- key WITHOUT "Bearer " prefix accepted on
+    //   /v1/* (and /anthropic/*). bearer+keyEnv already covers /v1; the
+    //   anthropic lane below carries its own auth.
+    // - X-Request-ID: echoed back by the gateway (trace id).
+    // - X-Session-ID: accepted on /v1/chat/completions AND /v1/messages —
+    //   sticky-routing hint so the SGLang worker holding our KV prefix keeps
+    //   serving the loop (radix-cache hit rate). Agents SHOULD send a stable
+    //   per-conversation id.
+    // - X-Reasoning-Passthrough: "false" strips reasoning_content from the
+    //   response (fewer completion tokens billed); unset/other = serialized.
+    // - Anthropic-Version: 2023-06-01 flips GET /v1/models to the Anthropic
+    //   schema (3 chat models, created_at epoch-0) and is required-ish on
+    //   /anthropic/v1/messages.
+    // - POST /v1/batches: 403 "requires the 'internal' role or higher" for
+    //   role:pro — batch lane is NOT entitlement-reachable; GET /v1/batches
+    //   (list) returns 200 empty. Do not build client batch flows.
+    // - /anthropic/v1/messages AND /v1/messages: live wire translator
+    //   (Anthropic schema). Known silent model fallback: requested minimax
+    //   → served qwen3.6-35b; never trust requested==served, read .model.
     modelOverrides: {
       "deepseek-v4-flash": {
         temperature: 0.2,
