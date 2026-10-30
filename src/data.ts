@@ -1320,6 +1320,65 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     },
   },
   {
+    name: "google-antigravity",
+    displayName: "Antigravity (Gemini 3, Claude, GPT-OSS)",
+    // 2026-10-29: sourced from toxicwind/tau, NOT live-probed (bridge down;
+    // live verification still pending). Antigravity is tau's google-gemini-cli
+    // wire (Cloud Code Assist, daily-cloudcode-pa.googleapis.com) surfaced
+    // under provider id "google-antigravity". Auth is tau-side OAuth
+    // (packages/ai/src/registry/oauth/google-antigravity.ts), not an API key,
+    // so keyEnv is empty and auth is none — the same honest shape as the
+    // google EAP entry above. Discovery is POST /v1internal:fetchAvailableModels
+    // (packages/catalog/src/discovery/antigravity.ts); no standard /models
+    // endpoint exists, so adapter is static and the list is carried here.
+    // Model list uses LIVE WIRE ids, not logical ids: plain claude-opus-4-6
+    // has no live wire id (only claude-opus-4-6-thinking; tau CHANGELOG
+    // #3067), gemini-2.5-pro is discovery-denylisted, gemini-3-pro-image is
+    // image-only (tau images/ lane), chat_20706/chat_23310/internal models
+    // are discovery-skipped. Claude wire ids cap output at 64000 (backend
+    // 400s above it), hence modelOverrides. Gemini context windows are tau
+    // discovery defaults (200000); Claude/GPT-OSS windows are undeclared
+    // (no verified number in hand — never demoted rather than wrongly demoted).
+    baseUrl: "https://daily-cloudcode-pa.googleapis.com",
+    keyEnv: "",
+    auth: "none",
+    adapter: "static",
+    staticModels: [
+      "gemini-3-pro",
+      "gemini-3.1-pro",
+      "gemini-3.1-flash-lite",
+      "gemini-3-flash-agent",
+      "gemini-3.5-flash-low",
+      "gemini-3.5-flash-extra-low",
+      "gemini-3.1-pro-low",
+      "gemini-pro-agent",
+      "claude-sonnet-4-6",
+      "claude-opus-4-6-thinking",
+      "claude-sonnet-4-5",
+      "claude-opus-4-5",
+      "gpt-oss-120b",
+    ],
+    seeds: [],
+    contextLengths: {
+      "gemini-3-pro": 200000,
+      "gemini-3.1-pro": 200000,
+      "gemini-3.1-flash-lite": 200000,
+      "gemini-3-flash-agent": 200000,
+      "gemini-3.5-flash-low": 200000,
+      "gemini-3.5-flash-extra-low": 200000,
+      "gemini-3.1-pro-low": 200000,
+      "gemini-pro-agent": 200000,
+    },
+    modelOverrides: {
+      "claude-sonnet-4-6": {
+        maxTokens: 64000,
+      },
+      "claude-opus-4-6-thinking": {
+        maxTokens: 64000,
+      },
+    },
+  },
+  {
     name: "github",
     displayName: "GitHub Models",
     // 2026-10-02: models.inference.ai.azure.com is DNS-dead; GitHub Models moved to models.github.ai.
