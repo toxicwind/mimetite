@@ -1,6 +1,6 @@
 {
   "schema": "routes-contract/1",
-  "generatedAt": "2026-10-29T00:27:06.218Z",
+  "generatedAt": "2026-10-30T00:32:46.691Z",
   "provenance": "@toxicwind/mimetite src/data.ts",
   "directives": {
     "lanes": [
@@ -1025,6 +1025,21 @@
         401
       ],
       "probePath": "/chat/completions"
+    },
+    {
+      "provider": "google-antigravity",
+      "modelProvider": null,
+      "baseUrl": "https://daily-cloudcode-pa.googleapis.com",
+      "api": "openai-completions",
+      "auth": "none",
+      "keyEnv": "",
+      "seeds": [],
+      "healthPath": "/v1/models",
+      "healthOk": [
+        200,
+        401
+      ],
+      "probePath": "/v1/chat/completions"
     },
     {
       "provider": "github",

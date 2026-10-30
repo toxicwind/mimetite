@@ -1521,6 +1521,48 @@ var PROVIDER_DEFS = [
     }
   },
   {
+    name: "google-antigravity",
+    displayName: "Antigravity (Gemini 3, Claude, GPT-OSS)",
+    baseUrl: "https://daily-cloudcode-pa.googleapis.com",
+    keyEnv: "",
+    auth: "none",
+    adapter: "static",
+    staticModels: [
+      "gemini-3-pro",
+      "gemini-3.1-pro",
+      "gemini-3.1-flash-lite",
+      "gemini-3-flash-agent",
+      "gemini-3.5-flash-low",
+      "gemini-3.5-flash-extra-low",
+      "gemini-3.1-pro-low",
+      "gemini-pro-agent",
+      "claude-sonnet-4-6",
+      "claude-opus-4-6-thinking",
+      "claude-sonnet-4-5",
+      "claude-opus-4-5",
+      "gpt-oss-120b"
+    ],
+    seeds: [],
+    contextLengths: {
+      "gemini-3-pro": 200000,
+      "gemini-3.1-pro": 200000,
+      "gemini-3.1-flash-lite": 200000,
+      "gemini-3-flash-agent": 200000,
+      "gemini-3.5-flash-low": 200000,
+      "gemini-3.5-flash-extra-low": 200000,
+      "gemini-3.1-pro-low": 200000,
+      "gemini-pro-agent": 200000
+    },
+    modelOverrides: {
+      "claude-sonnet-4-6": {
+        maxTokens: 64000
+      },
+      "claude-opus-4-6-thinking": {
+        maxTokens: 64000
+      }
+    }
+  },
+  {
     name: "github",
     displayName: "GitHub Models",
     baseUrl: "https://models.github.ai/inference",

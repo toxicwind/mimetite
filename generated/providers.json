@@ -1,6 +1,6 @@
 {
   "$schema": "estate-mimetite/v1",
-  "generatedAt": "2026-10-28T22:19:05.000Z",
+  "generatedAt": "2026-10-29T00:30:31.000Z",
   "generator": "@toxicwind/mimetite codegen — DO NOT EDIT BY HAND",
   "provenance": "@toxicwind/mimetite src/data.ts",
   "adapters": [
@@ -481,6 +481,30 @@
         "models/gemini-3.1-pro-preview",
         "models/gemini-3-flash-preview",
         "models/gemini-2.5-flash"
+      ]
+    },
+    {
+      "name": "google-antigravity",
+      "displayName": "Antigravity (Gemini 3, Claude, GPT-OSS)",
+      "baseUrl": "https://daily-cloudcode-pa.googleapis.com",
+      "keyEnv": "",
+      "keyEnvs": [],
+      "adapter": "static",
+      "auth": "none",
+      "staticModels": [
+        "gemini-3-pro",
+        "gemini-3.1-pro",
+        "gemini-3.1-flash-lite",
+        "gemini-3-flash-agent",
+        "gemini-3.5-flash-low",
+        "gemini-3.5-flash-extra-low",
+        "gemini-3.1-pro-low",
+        "gemini-pro-agent",
+        "claude-sonnet-4-6",
+        "claude-opus-4-6-thinking",
+        "claude-sonnet-4-5",
+        "claude-opus-4-5",
+        "gpt-oss-120b"
       ]
     },
     {
@@ -1080,6 +1104,7 @@
       "z-ai/glm-5.3-flash"
     ],
     "google": [],
+    "google-antigravity": [],
     "github": [
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
