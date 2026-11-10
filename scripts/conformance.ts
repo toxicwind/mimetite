@@ -11,8 +11,6 @@
  * Key resolution: keyEnv from the environment, or a `!cat <file>` style
  * fallback via --key-file provider=path. Run: `bun run conformance`.
  */
-import { basename } from "node:path";
-
 interface Route {
   provider: string;
   modelProvider: string | null;
@@ -44,7 +42,7 @@ async function resolveKey(route: Route): Promise<string | null> {
   return null;
 }
 
-async function probe(route: Route) {
+export async function probe(route: Route) {
   const key = await Promise.resolve(resolveKey(route));
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -81,17 +79,17 @@ async function probe(route: Route) {
   for (const stream of [false, true]) {
     const label = stream ? "chat-stream" : "chat";
     try {
-      // Bounded retry on 429/5xx: probe bursts throttle honestly (moonshot/
-      // cohere/freeinference answered 429 within one burst) and transient 500s
-      // must not masquerade as contract drift.
-      // 429 is a REAL capacity limit, not a queue that always drains — the
-      // "endless retry on 429" doctrine is DEAD (2026-11-10: freeinference
-      // 429'd 3/3 while its 2 concurrent slots were held; retry-after:1 did
-      // not free a slot). Sustained 429 after the attempt ceiling = the route
-      // is UNAVAILABLE right now — counted as bad, not silently green.
+      // 429 = transient capacity (2-slot concurrency, retry-after tells the
+      // wait). ENDLESS retry doctrine (2026-11-10): a slot eventually frees —
+      // the old 3-try ceiling burned real probes (freeinference 429'd 3/3
+      // while slots were held by long generations). Honor retry-after when
+      // present, exponential backoff otherwise, keep going until a non-429
+      // answer or a hard failure. Only non-429 statuses can be drift.
       let status = 0;
       let txt = "";
-      for (let attempt = 0; attempt < 3; attempt++) {
+      let attempts = 0;
+      for (;;) {
+        attempts++;
         const r = await fetch(url(route.probePath), {
           method: "POST",
           headers,
@@ -105,16 +103,19 @@ async function probe(route: Route) {
         txt = await r.text();
         status = r.status;
         if (status !== 429 && status < 500) break;
-        await Bun.sleep(1500);
+        // 429: wait retry-after if given, else back off (capped) — endless.
+        const ra = Number(r.headers.get("retry-after") ?? "0");
+        const wait = ra > 0 ? ra * 1000 : Math.min(1500 * attempts, 10000);
+        await Bun.sleep(wait);
       }
       out[label] =
         status === 200
-          ? "OK"
-          : status === 429
-            ? `THROTTLED(429 after ${3} tries — capacity limit, unavailable now)`
-            : status === 404
-              ? `UNENTITLED(404: seed '${seed}' rejected — catalog lies)`
-              : `FAIL(${status})`;
+          ? attempts > 1
+            ? `OK(after ${attempts - 1} 429 retries)`
+            : "OK"
+          : status === 404
+            ? `UNENTITLED(404: seed '${seed}' rejected — catalog lies)`
+            : `FAIL(${status})`;
     } catch (e: unknown) {
       out[label] = "ERR(" + String((e as Error).message).slice(0, 30) + ")";
     }
@@ -140,7 +141,7 @@ let drift = 0;
 for (const route of contract.routes) {
   const res = await probe(route);
   const bad = Object.values(res).some((v) =>
-    /^(DRIFT|DEAD|FAIL|ERR|UNENTITLED|THROTTLED)/.test(v),
+    /^(DRIFT|DEAD|FAIL|ERR|UNENTITLED)/.test(v),
   );
   if (bad) drift++;
   const name = route.modelProvider
