@@ -8,6 +8,8 @@
  * mimetite must never touch. This emitter rewrites ONLY:
  *   - model.model (default) — only if the current default is dead
  *   - model_aliases (whole block — mimetite-owned)
+ *   - custom_providers (freeinference row — mimetite-owned)
+ *   - mcp_servers.thresher (SSOT: gatehouse is DEAD — binary removed 2026-11-10)
  *   - appends NVIDIA_API_KEY_2 to .env if missing (2-key pool)
  *
  * Run: bun scripts/build-hermes.ts
@@ -142,6 +144,21 @@ function main() {
     out = out.replace(cpRe, cpBlock + "\n");
   } else {
     out = out.replace(/^(model_aliases:)/m, cpBlock + "\n$1");
+  }
+
+  // 1c. mcp_servers: gatehouse is DEAD (binary removed 2026-11-10) — thresher
+  // is the SSOT MCP gateway (http://127.0.0.1:25127/mcp). Replace a stale
+  // gatehouse entry with thresher; add thresher if mcp_servers lacks it.
+  if (/^mcp_servers:\n(?:[ \t]+.*\n?)*/m.test(out)) {
+    out = out.replace(/^mcp_servers:\n(?:[ \t]+.*\n?)*/m, (block) => {
+      let b = block.replace(/^  gatehouse:\n(?:[ \t]+.*\n?)*/m, "");
+      if (!/^  thresher:/m.test(b)) {
+        b += "  thresher:\n    url: http://127.0.0.1:25127/mcp\n    timeout: 180\n";
+      }
+      return b;
+    });
+  } else {
+    out += "\nmcp_servers:\n  thresher:\n    url: http://127.0.0.1:25127/mcp\n    timeout: 180\n";
   }
 
   // 2. NVIDIA key pool check (2026-11-10 recon): the entitled keys are
