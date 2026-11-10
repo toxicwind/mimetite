@@ -30,9 +30,9 @@ const LATENCY_LOG = `${CACHE_DIR}/mimetite-audit.jsonl`;
 const LAST_JSON = `${CACHE_DIR}/mimetite-audit-last.json`;
 
 const DEFAULT_REFS = [
-  `${HOME}/estate/config/tau/agent/config.yml`,
-  `${HOME}/estate/gateway/v1.4.2-fixed.json`,
-  `${HOME}/estate/config/tau/extensions/vansrouter.ts`,
+  `${HOME}/pens/olympus/ssot/tau/config.yml`,
+  `${HOME}/pens/olympus/ssot/tau/extensions/vansrouter.ts`,
+  `${HOME}/pens/geode/products/mimetite/generated/tau-models.yml`,
 ];
 
 // --- args ---

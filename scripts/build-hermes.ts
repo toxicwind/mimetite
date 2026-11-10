@@ -21,23 +21,27 @@ const HERMES_CONFIG = "/home/toxic/pens/hermes/config.yaml";
 const HERMES_ENV = "/home/toxic/pens/hermes/.env";
 
 // ── 2026-11-10 live-verified data (nvidia-keydiff.json + vercel-probe.json) ──
-// NIM usable on BOTH keys (14), sorted by speed. parse/riva/safety-guard are
-// special-purpose (not chat) — flagged but included.
-const NIM_USABLE: Array<[model: string, ms: number, kind: "chat" | "special"]> = [
-  ["nvidia/nemotron-parse-2.0", 226, "special"],
-  ["nvidia/nemotron-3-nano-omni-30b-a3b-reasoning", 227, "chat"],
-  ["nvidia/nemotron-3.5-bolt-e4b", 235, "chat"],
-  ["poolside/laguna-xs-2.1", 247, "chat"],
-  ["meta/llama-guard-4-12b", 265, "special"],
-  ["nvidia/nemotron-3.5-lightning-30b-a3b", 277, "chat"],
-  ["nvidia/riva-translate-4b-instruct-v2", 293, "special"],
-  ["nvidia/nemotron-3.5-super-vl-120b-a12b", 352, "chat"],
-  ["mistralai/mistral-large-4-1t-a52b", 355, "chat"],
-  ["nvidia/llama-3.1-nemotron-safety-guard-8b-v3", 396, "special"],
-  ["minimaxai/minimax-m3.1-flash", 629, "chat"],
-  ["nvidia/nemotron-3-ultra-550b-a55b", 944, "chat"],
-  ["meta/muse-glimmer-30b", 1187, "chat"],
-  ["meta/llama-3.2-90b-vision-instruct", 3583, "chat"],
+// One alias per verified-usable NIM model (168 probes, 2 keys, 40 RPM each;
+// gpt-oss-20b ms from the same-day 3-key probe). Sorted by speed (fastest
+// first). ttst = worst tok0→tok1 gap from the absurd-ttst scan (784 tau
+// session files, 2026-11-10); "—" = no session data for that model.
+const NIM_ALIASES: Array<[alias: string, model: string, ms: number, kind: "chat" | "special", ttst: string]> = [
+  ["nim-parse", "nvidia/nemotron-parse-2.0", 226, "special", "—"],
+  ["nim-snap", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning", 227, "chat", "43.7s"],
+  ["nim-bolt", "nvidia/nemotron-3.5-bolt-e4b", 235, "chat", "—"],
+  ["nim-laguna", "poolside/laguna-xs-2.1", 247, "chat", "—"],
+  ["nim-guard", "meta/llama-guard-4-12b", 265, "special", "—"],
+  ["nim-lightning", "nvidia/nemotron-3.5-lightning-30b-a3b", 277, "chat", "62.1s"],
+  ["nim-riva", "nvidia/riva-translate-4b-instruct-v2", 293, "special", "—"],
+  ["nim-supervl", "nvidia/nemotron-3.5-super-vl-120b-a12b", 352, "chat", "701.8s"],
+  ["nim-mistral4", "mistralai/mistral-large-4-1t-a52b", 355, "chat", "—"],
+  ["nim-safety", "nvidia/llama-3.1-nemotron-safety-guard-8b-v3", 396, "special", "—"],
+  ["nim-oss20", "openai/gpt-oss-20b", 567, "chat", "—"],
+  ["nim-minimax", "minimaxai/minimax-m3.1-flash", 629, "chat", "197.0s"],
+  ["nim-ultra", "nvidia/nemotron-3-ultra-550b-a55b", 944, "chat", "129.8s"],
+  ["nim-step", "stepfun-ai/step-5-preview", 1096, "chat", "167.1s"],
+  ["nim-glimmer", "meta/muse-glimmer-30b", 1187, "chat", "—"],
+  ["nim-vision", "meta/llama-3.2-90b-vision-instruct", 3583, "chat", "—"],
 ];
 
 // Vercel-usable chat picks (verified 200, free tier)
@@ -50,37 +54,48 @@ const VC_PICKS: Array<[alias: string, model: string, ms: number]> = [
   ["vc-oss120", "openai/gpt-oss-120b", 345],
 ];
 
-// FreeInference (Harvard SEAS) — separate surface, own key
+// FreeInference (Harvard SEAS) — separate surface, own key.
+// fi-* prefix (NOT nim-*): these ride freeinference.org, not NVIDIA NIM.
 const FI_PICKS: Array<[alias: string, model: string]> = [
-  ["nim-free", "glm-5.3-flash"],
-  ["nim-coding", "qwen3.6-35b"],
+  ["fi-free", "glm-5.3-flash"],
+  ["fi-coding", "qwen3.6-35b"],
+  ["fi-flash", "deepseek-v4-flash"],
 ];
+
+// FreeInference provider row for the /model picker (custom_providers entry).
+// The aliases above resolve short names; this block makes the endpoint + its
+// live models visible as a user-defined provider row. Models are the
+// key-gated /v1/models catalog (verified 2026-11-10); bge-m3 is embeddings-only.
+const FI_MODELS: Array<[model: string, note: string]> = [
+  ["glm-5.3-flash", "1M ctx, zai, tools"],
+  ["qwen3.6-35b", "262k ctx, vllm, tools"],
+  ["deepseek-v4-flash", "1M ctx, sglang, tools"],
+];
+
+function buildCustomProvidersBlock(): string {
+  const lines: string[] = [];
+  lines.push("custom_providers:");
+  lines.push("  - name: freeinference");
+  lines.push("    base_url: https://freeinference.org/v1");
+  lines.push("    key_env: FREEINFERENCE_API_KEY");
+  lines.push("    api_mode: chat_completions");
+  lines.push("    models:");
+  for (const [model] of FI_MODELS) {
+    lines.push(`      ${model}: {}`);
+  }
+  return lines.join("\n");
+}
 
 function buildAliasBlock(): string {
   const lines: string[] = [];
   lines.push("model_aliases:");
-  // nim-* — NIM-direct chat models (the 14; special-purpose get explicit names)
-  const chatAliases: Array<[string, string]> = [
-    ["nim-lightning", "nvidia/nemotron-3.5-lightning-30b-a3b"],
-    ["nim-snap", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"],
-    ["nim-bolt", "nvidia/nemotron-3.5-bolt-e4b"],
-    ["nim-laguna", "poolside/laguna-xs-2.1"],
-    ["nim-supervl", "nvidia/nemotron-3.5-super-vl-120b-a12b"],
-    ["nim-mistral4", "mistralai/mistral-large-4-1t-a52b"],
-    ["nim-minimax", "minimaxai/minimax-m3.1-flash"],
-    ["nim-apex", "nvidia/nemotron-3-ultra-550b-a55b"],
-    ["nim-ultra", "nvidia/nemotron-3-ultra-550b-a55b"],
-    ["nim-reasoning", "nvidia/nemotron-3-ultra-550b-a55b"],
-    ["nim-deep", "nvidia/nemotron-3-ultra-550b-a55b"],
-    ["nim-swarm", "nvidia/nemotron-3-ultra-550b-a55b"],
-    ["nim-glimmer", "meta/muse-glimmer-30b"],
-    ["nim-vision", "meta/llama-3.2-90b-vision-instruct"],
-    ["nim-oss20", "openai/gpt-oss-20b"],
-  ];
-  for (const [alias, model] of chatAliases) {
+  // nim-* — one alias per verified-usable NIM-direct model, ranked by speed
+  // (fastest first); ttst comment = worst tok0→tok1 gap (absurd-ttst scan).
+  for (const [alias, model, ms, kind, ttst] of NIM_ALIASES) {
     lines.push(`  ${alias}:`);
     lines.push(`    model: ${model}`);
     lines.push(`    provider: nvidia`);
+    lines.push(`    # ${ms}ms keydiff · ttst ${ttst} · ${kind}`);
   }
   // vc-* — Vercel AI Gateway
   for (const [alias, model] of VC_PICKS) {
@@ -115,10 +130,27 @@ function main() {
     out = config.replace(/^(memory:)/m, aliasBlock + "\n$1");
   }
 
-  // 2. Ensure the 2nd NVIDIA key is in .env (keyEnvAlt pool)
+  // 1b. Replace/insert the custom_providers block (mimetite-owned: the
+  // freeinference endpoint row). Other custom_providers entries are NOT
+  // touched — only the freeinference member is regenerated.
+  const cpBlock = buildCustomProvidersBlock();
+  const cpRe = /^custom_providers:\n(?:[ \t]+.*\n?)*/m;
+  if (cpRe.test(out)) {
+    out = out.replace(cpRe, cpBlock + "\n");
+  } else {
+    out = out.replace(/^(model_aliases:)/m, cpBlock + "\n$1");
+  }
+
+  // 2. NVIDIA key pool check (2026-11-10 recon): the entitled keys are
+  // NVIDIA_API_KEY (nvapi-SB…, master) + ~/.tau/nvidia-3.key (nvapi-_Gdr…,
+  // verified 200). NVIDIA_API_KEY_2 was a DUD (403 everywhere — no Public
+  // API Endpoints entitlement) and was removed from .env; never re-add it.
   let envOut = env;
-  if (!/^NVIDIA_API_KEY_2=/m.test(envOut)) {
-    console.warn("NVIDIA_API_KEY_2 missing from .env — add it for the 2-key pool");
+  if (/^NVIDIA_API_KEY_2=/m.test(envOut)) {
+    console.warn("NVIDIA_API_KEY_2 is a dead key (403 on every surface) — remove it from .env");
+  }
+  if (!/^NVIDIA_API_KEY=/m.test(envOut)) {
+    console.warn("NVIDIA_API_KEY missing from .env — the entitled master key is required");
   }
 
   writeFileSync(HERMES_CONFIG, out);

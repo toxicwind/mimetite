@@ -3,7 +3,7 @@
   "contract": "estate-mimetite/kappa-catalog/v1",
   "generator": "@toxicwind/mimetite codegen — kappa target (full profile) — DO NOT EDIT BY HAND",
   "provenance": "@toxicwind/mimetite src/data.ts",
-  "generatedAt": "2026-10-30T00:35:05.000Z",
+  "generatedAt": "2026-11-10T08:38:01.000Z",
   "deadIds": [
     "llama-3.3-70b-versatile",
     "meta-llama/llama-3.1-8b-instruct",
@@ -123,9 +123,9 @@
       "groq",
       "meta-llama/llama-4-scout-17b-16e-instruct"
     ],
-    "nim-lightning": [
+    "nim-parse": [
       "nvidia",
-      "nvidia/nemotron-3.5-lightning-30b-a3b"
+      "nvidia/nemotron-parse-2.0"
     ],
     "nim-snap": [
       "nvidia",
@@ -139,6 +139,18 @@
       "nvidia",
       "poolside/laguna-xs-2.1"
     ],
+    "nim-guard": [
+      "nvidia",
+      "meta/llama-guard-4-12b"
+    ],
+    "nim-lightning": [
+      "nvidia",
+      "nvidia/nemotron-3.5-lightning-30b-a3b"
+    ],
+    "nim-riva": [
+      "nvidia",
+      "nvidia/riva-translate-4b-instruct-v2"
+    ],
     "nim-supervl": [
       "nvidia",
       "nvidia/nemotron-3.5-super-vl-120b-a12b"
@@ -147,9 +159,25 @@
       "nvidia",
       "mistralai/mistral-large-4-1t-a52b"
     ],
+    "nim-safety": [
+      "nvidia",
+      "nvidia/llama-3.1-nemotron-safety-guard-8b-v3"
+    ],
+    "nim-oss20": [
+      "nvidia",
+      "openai/gpt-oss-20b"
+    ],
     "nim-minimax": [
       "nvidia",
       "minimaxai/minimax-m3.1-flash"
+    ],
+    "nim-ultra": [
+      "nvidia",
+      "nvidia/nemotron-3-ultra-550b-a55b"
+    ],
+    "nim-step": [
+      "nvidia",
+      "stepfun-ai/step-5-preview"
     ],
     "nim-glimmer": [
       "nvidia",
@@ -158,10 +186,6 @@
     "nim-vision": [
       "nvidia",
       "meta/llama-3.2-90b-vision-instruct"
-    ],
-    "nim-oss20": [
-      "nvidia",
-      "openai/gpt-oss-20b"
     ],
     "vc-lightning-free": [
       "vercel-gateway",
@@ -186,6 +210,14 @@
     "vc-oss120": [
       "vercel-gateway",
       "openai/gpt-oss-120b"
+    ],
+    "fi-free": [
+      "freeinference",
+      "glm-5.3-flash"
+    ],
+    "fi-coding": [
+      "freeinference",
+      "qwen3.6-35b"
     ]
   },
   "seeds": {

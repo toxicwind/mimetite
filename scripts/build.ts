@@ -241,7 +241,7 @@ const installed = buildInstalledTauYaml(
 // (checked in) are the CI contract; these two writes are the live-box sync.
 for (const p of [
   "/home/toxic/.tau/models.yml",
-  "/home/toxic/estate/config/tau/models.yml",
+  "/home/toxic/pens/olympus/ssot/tau/models.yml",
 ]) {
   try {
     await Bun.write(p, installed);
@@ -250,7 +250,7 @@ for (const p of [
   }
 }
 console.log(
-  "synced installed slice to ~/.tau/models.yml and estate/config/tau/models.yml",
+  "synced installed slice to ~/.tau/models.yml and pens/olympus/ssot/tau/models.yml",
 );
 
 const kappaInstalled = buildInstalledKappaJson(
@@ -264,7 +264,7 @@ const kappaInstalled = buildInstalledKappaJson(
 );
 for (const p of [
   "/home/toxic/.config/kappa/kappa-models.json",
-  "/home/toxic/estate/config/kappa/kappa-models.json",
+  "/home/toxic/pens/olympus/ssot/kappa/kappa-models.json",
 ]) {
   try {
     await Bun.write(p, kappaInstalled);
@@ -273,5 +273,5 @@ for (const p of [
   }
 }
 console.log(
-  "synced installed slice to ~/.config/kappa/kappa-models.json and estate/config/kappa/kappa-models.json",
+  "synced installed slice to ~/.config/kappa/kappa-models.json and pens/olympus/ssot/kappa/kappa-models.json",
 );

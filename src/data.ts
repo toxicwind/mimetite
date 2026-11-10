@@ -1823,23 +1823,33 @@ export const MODEL_ALIASES: Record<string, ModelAlias> = {
   "groq-gpt-oss-20b": ["groq", "openai/gpt-oss-20b"],
   "groq-qwen3.8-27b": ["groq", "qwen/qwen3.8-27b"],
   "groq-llama-4-scout": ["groq", "meta-llama/llama-4-scout-17b-16e-instruct"],
-  // ── hermes targets (2026-11-10 keydiff: 14 NIM-usable both-keys) ──
-  "nim-lightning": ["nvidia", "nvidia/nemotron-3.5-lightning-30b-a3b"],
+  // ── hermes targets (2026-11-10 keydiff: 16 NIM-usable; one alias per model) ──
+  "nim-parse": ["nvidia", "nvidia/nemotron-parse-2.0"],
   "nim-snap": ["nvidia", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"],
   "nim-bolt": ["nvidia", "nvidia/nemotron-3.5-bolt-e4b"],
   "nim-laguna": ["nvidia", "poolside/laguna-xs-2.1"],
+  "nim-guard": ["nvidia", "meta/llama-guard-4-12b"],
+  "nim-lightning": ["nvidia", "nvidia/nemotron-3.5-lightning-30b-a3b"],
+  "nim-riva": ["nvidia", "nvidia/riva-translate-4b-instruct-v2"],
   "nim-supervl": ["nvidia", "nvidia/nemotron-3.5-super-vl-120b-a12b"],
   "nim-mistral4": ["nvidia", "mistralai/mistral-large-4-1t-a52b"],
+  "nim-safety": ["nvidia", "nvidia/llama-3.1-nemotron-safety-guard-8b-v3"],
+  "nim-oss20": ["nvidia", "openai/gpt-oss-20b"],
   "nim-minimax": ["nvidia", "minimaxai/minimax-m3.1-flash"],
+  "nim-ultra": ["nvidia", "nvidia/nemotron-3-ultra-550b-a55b"],
+  "nim-step": ["nvidia", "stepfun-ai/step-5-preview"],
   "nim-glimmer": ["nvidia", "meta/muse-glimmer-30b"],
   "nim-vision": ["nvidia", "meta/llama-3.2-90b-vision-instruct"],
-  "nim-oss20": ["nvidia", "openai/gpt-oss-20b"],
   "vc-lightning-free": ["vercel-gateway", "nvidia/nemotron-3.5-lightning-free"],
   "vc-fast": ["vercel-gateway", "morph/morph-v3-fast"],
   "vc-ultra": ["vercel-gateway", "nvidia/nemotron-3-ultra-550b-a55b"],
   "vc-glm": ["vercel-gateway", "zai/glm-4.7-flash"],
   "vc-r1": ["vercel-gateway", "deepseek/deepseek-r1"],
   "vc-oss120": ["vercel-gateway", "openai/gpt-oss-120b"],
+  // FreeInference (Harvard SEAS) — fi-* prefix (NOT nim-*): these ride
+  // freeinference.org, not NVIDIA NIM. Mirrors build-hermes.ts FI_PICKS.
+  "fi-free": ["freeinference", "glm-5.3-flash"],
+  "fi-coding": ["freeinference", "qwen3.6-35b"],
 };
 
 /**
