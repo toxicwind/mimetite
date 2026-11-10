@@ -84,9 +84,13 @@ async function probe(route: Route) {
       // One retry with backoff on 429/5xx: probe bursts throttle honestly
       // (moonshot/cohere/freeinference answered 429 within one burst) and
       // transient 500s must not masquerade as contract drift.
+      // 429 is a QUEUE-THROTTLE signal, not a broken contract (freeinference
+      // doctrine: endless retry on 429 — single-lane queue + quota, anomaly #4).
+      // It retries up to the attempt ceiling then classifies as throttled,
+      // which is NOT drift.
       let status = 0;
       let txt = "";
-      for (let attempt = 0; attempt < 2; attempt++) {
+      for (let attempt = 0; attempt < 3; attempt++) {
         const r = await fetch(url(route.probePath), {
           method: "POST",
           headers,
@@ -105,9 +109,11 @@ async function probe(route: Route) {
       out[label] =
         status === 200
           ? "OK"
-          : status === 404
-            ? `UNENTITLED(404: seed '${seed}' rejected — catalog lies)`
-            : `FAIL(${status})`;
+          : status === 429
+            ? `throttled(429 after ${3} tries − queue, not contract)` // NOT drift
+            : status === 404
+              ? `UNENTITLED(404: seed '${seed}' rejected — catalog lies)`
+              : `FAIL(${status})`;
     } catch (e: unknown) {
       out[label] = "ERR(" + String((e as Error).message).slice(0, 30) + ")";
     }
