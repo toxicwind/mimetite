@@ -160,7 +160,10 @@ function main() {
   console.log(`wrote ${HERMES_CONFIG} (model_aliases block: ${aliasBlock.split("\n").length} lines)`);
 
   // 3. Report what the default should be
-  const defaultModel = "nvidia/nemotron-3.5-lightning-free"; // verified 200 free-tier, 276ms
+  // 2026-11-10 accurate TTST probe: lightning-free is 1440ms text TTFT —
+  // SLOWEST vc-* alias, NOT the "276ms" the keydiff probe claimed. The
+  // measured-best free default is vc-fast (morph-v3-fast, 255ms, 2/2 arms).
+  const defaultModel = "morph/morph-v3-fast"; // verified 200 free-tier, 255ms TTFT
   const currentDefault = config.match(/^model:\n(?:[ \t]+.*\n)*?[ \t]+default: (.+)$/m)?.[1];
   console.log(`default model: current=${currentDefault} recommended=${defaultModel}`);
   console.log(`NOTE: mimetite does NOT rewrite model.default — hermes owns it. Update manually or via hermes setup model.`);
