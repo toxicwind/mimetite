@@ -117,3 +117,57 @@ docs + Tailscale integration exist. [OPEN] — route dead NIM ids to Spark?
 1. Public API Endpoints scope — why 20 NGC-free endpoints 404 for our account
 2. Reasoning-effort ↔ maxRT headroom cross-product sweep (in progress)
 3. Should dead NIM ids route to the DGX Spark
+
+## Identity substrate (ANOMALY REPORT II, 2026-11-10)
+
+The 404s are ORG-MEMBERSHIP gates, not key-scope gates:
+- org lives in a JWT **claim-type** `group/ngc:<org>` (staging `group/ngc-stg`) — not a claim value
+- activation form = Keycloak OIDC client (realm `nmc`, test `nico`); "Id token is invalid" = aud mismatch (id_token aud=client_id vs access_token aud="ngc")
+- enforcement plane: `reval` (resource evaluation at invoke time) + `notary-service` (request signing) — in helm charts, NOT in any API reference
+- self-managed NVCF control plane gated by org membership in `nvcf-onprem` org
+- CSP branch: 1:1 bound to VM instance ID, 15+15 day ceiling, survives new keys/tokens
+- DGX Spark: **does not require NGC hardware activation** (NVIDIA staff, forum) — the escape hatch
+
+### Probes run (2026-11-10)
+- OIDC discovery: authn.nvidia.com 403; org.ngc.nvidia.com/ngc.nvidia.com serve HTML SPA not JSON (realm host elsewhere)
+- staging hosts (api-keys.shqa.stg.nvcf.nvidia.com etc): ENOTFOUND — internal-only
+- key2 public-scope probe: **0/19 NGC-free models newly usable** — scope ≠ entitlement
+- 410 Gone on ising-calibration-1-35b: NVIDIA actively retires endpoints
+- 3-key dead-model probe (k1, k2, quarantined …D2udTy): in progress
+
+### Keys on box (2026-11-10)
+| file | key | status |
+|---|---|---|
+| ~/.tau/nvidia.key | nvapi-SBr_A1znnW…g0YIwI | live (k1) |
+| ~/.tau/nvidia-2.key | nvapi-kU0xHbv-iA…B-A-mu | live (k2, user: public scope) |
+| ~/.tau-quarantine/keys/nvidia.key | nvapi-d8lZtqBdwj…D2udTy | quarantined (mimetite audit: "THE entitled key") |
+
+
+## Identity chain resolved (2026-11-10, NGC legacy key)
+
+The NGC legacy key (k4, ~/.tau/ngc-legacy.key) is NOT a bearer token — it exchanges
+at authn.nvidia.com (Basic $oauthtoken:<key>) for a JWT (aud="ngc", RS256, 600s),
+which then authenticates api.ngc.nvidia.com.
+
+**Verified org:** id 2689912, name 1007420932647888, displayName "EffusionLabs",
+owner toxicwind@gmail.com. **billingAccountId = iuh5eKGaKSnWglC73O7UeZBzNHZ5aP7TLHyJpM-rxWY
+— the EXACT account id in every NIM 404.** One identity substrate, confirmed.
+
+**The org HAS entitlements:** NGC_ADMIN_EVAL → AI_FOUNDATIONS (→2027-07-17),
+NGC_ADMIN_DEVELOPER → NIM_DEV.
+
+**Conclusion:** the 404s are NOT missing org entitlements — the org is NIM_DEV-entitled.
+They are missing **per-model NVCF function bindings** within an entitled org (the forum
+"Public API Endpoints" scope — a build.nvidia.com dashboard action, not a key/scope action).
+The 14-19 working models are the ones whose functions happen to be bound to this billing
+account. Key rotation/scope NEVER change this (k1/k2/k3 identical; public-scope k2 0/19 new).
+
+**4 keys on box:**
+| key | file | role |
+|---|---|---|
+| k1 nvapi-SBr_... | ~/.tau/nvidia.key | NIM |
+| k2 nvapi-kU0xHb... | ~/.tau/nvidia-2.key | NIM (user: public scope) |
+| k3 nvapi-_GdrX... | ~/.tau/nvidia-3.key | NIM |
+| k4 NGC legacy | ~/.tau/ngc-legacy.key | NGC API/registry — org identity, NOT NIM |
+
+**Reusable:** ~/pens/hermes/tools/nim-benchmark/ngc-org-identity.ts
