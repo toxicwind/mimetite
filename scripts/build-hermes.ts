@@ -20,38 +20,40 @@ const here = dirname(fileURLToPath(import.meta.url));
 const HERMES_CONFIG = "/home/toxic/pens/hermes/config.yaml";
 const HERMES_ENV = "/home/toxic/pens/hermes/.env";
 
-// ── 2026-11-10 live-verified data (nvidia-keydiff.json + vercel-probe.json) ──
-// One alias per verified-usable NIM model (168 probes, 2 keys, 40 RPM each;
-// gpt-oss-20b ms from the same-day 3-key probe). Sorted by speed (fastest
-// first). ttst = worst tok0→tok1 gap from the absurd-ttst scan (784 tau
-// session files, 2026-11-10); "—" = no session data for that model.
+// ── 2026-11-10 live-verified data (ttst-alias-results.json — accurate probe) ──
+// One alias per verified-usable NIM model. ms = worst-arm TTFT (first token
+// latency, text/tool) from the 2026-11-10 24-alias TTST probe (2 arms each,
+// 1 run; results in /home/toxic/tmp/ttst-alias-results.json). Sorted by speed
+// (fastest first). ttst = worst tok0→tok1 gap from the absurd-ttst scan (784
+// tau session files, 2026-11-10); "—" = no session data for that model.
 const NIM_ALIASES: Array<[alias: string, model: string, ms: number, kind: "chat" | "special", ttst: string]> = [
-  ["nim-parse", "nvidia/nemotron-parse-2.0", 226, "special", "—"],
-  ["nim-snap", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning", 227, "chat", "43.7s"],
-  ["nim-bolt", "nvidia/nemotron-3.5-bolt-e4b", 235, "chat", "—"],
-  ["nim-laguna", "poolside/laguna-xs-2.1", 247, "chat", "—"],
-  ["nim-guard", "meta/llama-guard-4-12b", 265, "special", "—"],
-  ["nim-lightning", "nvidia/nemotron-3.5-lightning-30b-a3b", 277, "chat", "62.1s"],
-  ["nim-riva", "nvidia/riva-translate-4b-instruct-v2", 293, "special", "—"],
-  ["nim-supervl", "nvidia/nemotron-3.5-super-vl-120b-a12b", 352, "chat", "701.8s"],
-  ["nim-mistral4", "mistralai/mistral-large-4-1t-a52b", 355, "chat", "—"],
-  ["nim-safety", "nvidia/llama-3.1-nemotron-safety-guard-8b-v3", 396, "special", "—"],
-  ["nim-oss20", "openai/gpt-oss-20b", 567, "chat", "—"],
-  ["nim-minimax", "minimaxai/minimax-m3.1-flash", 629, "chat", "197.0s"],
-  ["nim-ultra", "nvidia/nemotron-3-ultra-550b-a55b", 944, "chat", "129.8s"],
-  ["nim-step", "stepfun-ai/step-5-preview", 1096, "chat", "167.1s"],
-  ["nim-glimmer", "meta/muse-glimmer-30b", 1187, "chat", "—"],
-  ["nim-vision", "meta/llama-3.2-90b-vision-instruct", 3583, "chat", "—"],
+  ["nim-parse", "nvidia/nemotron-parse-2.0", 0, "special", "—"],
+  ["nim-laguna", "poolside/laguna-xs-2.1", 170, "chat", "—"],
+  ["nim-lightning", "nvidia/nemotron-3.5-lightning-30b-a3b", 223, "chat", "62.1s"],
+  ["nim-supervl", "nvidia/nemotron-3.5-super-vl-120b-a12b", 226, "chat", "701.8s"],
+  ["nim-guard", "meta/llama-guard-4-12b", 231, "special", "—"],
+  ["nim-riva", "nvidia/riva-translate-4b-instruct-v2", 251, "special", "—"],
+  ["nim-safety", "nvidia/llama-3.1-nemotron-safety-guard-8b-v3", 251, "special", "—"],
+  ["nim-snap", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning", 285, "chat", "43.7s"],
+  ["nim-bolt", "nvidia/nemotron-3.5-bolt-e4b", 353, "chat", "—"],
+  ["nim-step", "stepfun-ai/step-5-preview", 367, "chat", "167.1s"],
+  ["nim-ultra", "nvidia/nemotron-3-ultra-550b-a55b", 2586, "chat", "129.8s"],
+  ["nim-minimax", "minimaxai/minimax-m3.1-flash", 2605, "chat", "197.0s"],
+  ["nim-vision", "meta/llama-3.2-90b-vision-instruct", 6897, "chat", "—"],
+  ["nim-glimmer", "meta/muse-glimmer-30b", 7762, "chat", "—"],
+  ["nim-mistral4", "mistralai/mistral-large-4-1t-a52b", 27165, "chat", "—"],
+  ["nim-oss20", "openai/gpt-oss-20b", 44022, "chat", "—"],
 ];
 
-// Vercel-usable chat picks (verified 200, free tier)
+// Vercel-usable chat picks (verified 200, free tier); ms = worst-arm TTFT
+// from the same 2026-11-10 TTST probe.
 const VC_PICKS: Array<[alias: string, model: string, ms: number]> = [
-  ["vc-lightning-free", "nvidia/nemotron-3.5-lightning-free", 276],
-  ["vc-fast", "morph/morph-v3-fast", 260],
-  ["vc-ultra", "nvidia/nemotron-3-ultra-550b-a55b", 360],
-  ["vc-glm", "zai/glm-4.7-flash", 325],
-  ["vc-r1", "deepseek/deepseek-r1", 411],
-  ["vc-oss120", "openai/gpt-oss-120b", 345],
+  ["vc-fast", "morph/morph-v3-fast", 255],
+  ["vc-ultra", "nvidia/nemotron-3-ultra-550b-a55b", 357],
+  ["vc-glm", "zai/glm-4.7-flash", 614],
+  ["vc-oss120", "openai/gpt-oss-120b", 638],
+  ["vc-r1", "deepseek/deepseek-r1", 1110],
+  ["vc-lightning-free", "nvidia/nemotron-3.5-lightning-free", 1440],
 ];
 
 // FreeInference (Harvard SEAS) — separate surface, own key.
@@ -95,15 +97,16 @@ function buildAliasBlock(): string {
     lines.push(`  ${alias}:`);
     lines.push(`    model: ${model}`);
     lines.push(`    provider: nvidia`);
-    lines.push(`    # ${ms}ms keydiff · ttst ${ttst} · ${kind}`);
+    lines.push(`    # ${ms}ms ttft · ttst ${ttst} · ${kind}`);
   }
   // vc-* — Vercel AI Gateway
-  for (const [alias, model] of VC_PICKS) {
+  for (const [alias, model, ms] of VC_PICKS) {
     lines.push(`  ${alias}:`);
     lines.push(`    model: ${model}`);
     lines.push(`    provider: ai-gateway`);
     lines.push(`    base_url: https://ai-gateway.vercel.sh/v1`);
     lines.push(`    key_env: AI_GATEWAY_API_KEY`);
+    lines.push(`    # ${ms}ms ttft`);
   }
   // FreeInference
   for (const [alias, model] of FI_PICKS) {
