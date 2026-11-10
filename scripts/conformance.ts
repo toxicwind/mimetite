@@ -81,13 +81,14 @@ async function probe(route: Route) {
   for (const stream of [false, true]) {
     const label = stream ? "chat-stream" : "chat";
     try {
-      // One retry with backoff on 429/5xx: probe bursts throttle honestly
-      // (moonshot/cohere/freeinference answered 429 within one burst) and
-      // transient 500s must not masquerade as contract drift.
-      // 429 is a QUEUE-THROTTLE signal, not a broken contract (freeinference
-      // doctrine: endless retry on 429 — single-lane queue + quota, anomaly #4).
-      // It retries up to the attempt ceiling then classifies as throttled,
-      // which is NOT drift.
+      // Bounded retry on 429/5xx: probe bursts throttle honestly (moonshot/
+      // cohere/freeinference answered 429 within one burst) and transient 500s
+      // must not masquerade as contract drift.
+      // 429 is a REAL capacity limit, not a queue that always drains — the
+      // "endless retry on 429" doctrine is DEAD (2026-11-10: freeinference
+      // 429'd 3/3 while its 2 concurrent slots were held; retry-after:1 did
+      // not free a slot). Sustained 429 after the attempt ceiling = the route
+      // is UNAVAILABLE right now — counted as bad, not silently green.
       let status = 0;
       let txt = "";
       for (let attempt = 0; attempt < 3; attempt++) {
@@ -110,7 +111,7 @@ async function probe(route: Route) {
         status === 200
           ? "OK"
           : status === 429
-            ? `throttled(429 after ${3} tries − queue, not contract)` // NOT drift
+            ? `THROTTLED(429 after ${3} tries — capacity limit, unavailable now)`
             : status === 404
               ? `UNENTITLED(404: seed '${seed}' rejected — catalog lies)`
               : `FAIL(${status})`;
@@ -139,7 +140,7 @@ let drift = 0;
 for (const route of contract.routes) {
   const res = await probe(route);
   const bad = Object.values(res).some((v) =>
-    /^(DRIFT|DEAD|FAIL|ERR|UNENTITLED)/.test(v),
+    /^(DRIFT|DEAD|FAIL|ERR|UNENTITLED|THROTTLED)/.test(v),
   );
   if (bad) drift++;
   const name = route.modelProvider
