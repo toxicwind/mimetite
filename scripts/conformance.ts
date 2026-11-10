@@ -34,7 +34,7 @@ const REDACT = (s: string) => (s ? `...${s.slice(-4)}` : "(none)");
 
 async function resolveKey(route: Route): Promise<string | null> {
   if (route.auth === "none") return null;
-  if (process.env[route.keyEnv]) return process.env[route.keyEnv];
+  if (process.env[route.keyEnv]) return process.env[route.keyEnv] ?? null;
   const argPrefix = `--key-file:${route.provider}`;
   const arg = process.argv.find((a) => a.startsWith(argPrefix + "="));
   if (arg) {

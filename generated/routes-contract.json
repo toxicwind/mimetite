@@ -1,6 +1,6 @@
 {
   "schema": "routes-contract/1",
-  "generatedAt": "2026-10-30T00:32:46.691Z",
+  "generatedAt": "2026-11-10T08:32:20.593Z",
   "provenance": "@toxicwind/mimetite src/data.ts",
   "directives": {
     "lanes": [
@@ -111,7 +111,10 @@
       "seeds": [
         "meta/llama-3.2-11b-vision-instruct",
         "meta/muse-glimmer-30b",
-        "nvidia/ising-calibration-1.5-31b",
+        "meta/llama-3.2-90b-vision-instruct",
+        "meta/llama-guard-4-12b",
+        "minimaxai/minimax-m3.1-flash",
+        "mistralai/mistral-large-4-1t-a52b",
         "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
         "nvidia/nemotron-3-ultra-550b-a55b",
         "nvidia/nemotron-3.5-bolt-e4b",
@@ -119,9 +122,31 @@
         "nvidia/nemotron-3.5-lightning-30b-a3b",
         "nvidia/nemotron-3.5-super-vl-120b-a12b",
         "nvidia/nemotron-parse-2.0",
+        "nvidia/riva-translate-4b-instruct-v2",
         "openai/gpt-oss-20b",
-        "poolside/laguna-xs-2.1",
-        "z-ai/glm-5.3-flash"
+        "poolside/laguna-xs-2.1"
+      ],
+      "healthPath": "/models",
+      "healthOk": [
+        200,
+        401
+      ],
+      "probePath": "/chat/completions"
+    },
+    {
+      "provider": "vercel-gateway",
+      "modelProvider": null,
+      "baseUrl": "https://ai-gateway.vercel.sh/v1",
+      "api": "openai-completions",
+      "auth": "bearer",
+      "keyEnv": "AI_GATEWAY_API_KEY",
+      "seeds": [
+        "nvidia/nemotron-3.5-lightning-free",
+        "morph/morph-v3-fast",
+        "nvidia/nemotron-3-ultra-550b-a55b",
+        "zai/glm-4.7-flash",
+        "deepseek/deepseek-r1",
+        "openai/gpt-oss-120b"
       ],
       "healthPath": "/models",
       "healthOk": [

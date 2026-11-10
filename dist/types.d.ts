@@ -20,6 +20,13 @@ export interface ProviderDef {
     keyEnv: string;
     /** Alternate env var (multi-key pools), e.g. "NVIDIA_API_KEYS". */
     keyEnvAlt?: string;
+    /**
+     * Real API key shape for this provider (regex), sourced from provider code
+     * and estate probes (2026-11-10 blackbird audit). Used to classify/validate
+     * keys before routing; a key that fails its provider's pattern is rejected
+     * early instead of burning an upstream 401/403 round-trip.
+     */
+    keyPattern?: string;
     /** Which endpoint-shape adapter reads this provider's model list. */
     adapter: AdapterId;
     /** Path appended to baseUrl. Defaults per adapter ("openai" -> "/models"). */

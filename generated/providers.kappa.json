@@ -3,7 +3,7 @@
   "contract": "estate-mimetite/kappa-catalog/v1",
   "generator": "@toxicwind/mimetite codegen — kappa target (full profile) — DO NOT EDIT BY HAND",
   "provenance": "@toxicwind/mimetite src/data.ts",
-  "generatedAt": "2026-10-29T00:30:31.000Z",
+  "generatedAt": "2026-10-30T00:35:05.000Z",
   "deadIds": [
     "llama-3.3-70b-versatile",
     "meta-llama/llama-3.1-8b-instruct",
@@ -118,6 +118,74 @@
     "groq-qwen3.8-27b": [
       "groq",
       "qwen/qwen3.8-27b"
+    ],
+    "groq-llama-4-scout": [
+      "groq",
+      "meta-llama/llama-4-scout-17b-16e-instruct"
+    ],
+    "nim-lightning": [
+      "nvidia",
+      "nvidia/nemotron-3.5-lightning-30b-a3b"
+    ],
+    "nim-snap": [
+      "nvidia",
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"
+    ],
+    "nim-bolt": [
+      "nvidia",
+      "nvidia/nemotron-3.5-bolt-e4b"
+    ],
+    "nim-laguna": [
+      "nvidia",
+      "poolside/laguna-xs-2.1"
+    ],
+    "nim-supervl": [
+      "nvidia",
+      "nvidia/nemotron-3.5-super-vl-120b-a12b"
+    ],
+    "nim-mistral4": [
+      "nvidia",
+      "mistralai/mistral-large-4-1t-a52b"
+    ],
+    "nim-minimax": [
+      "nvidia",
+      "minimaxai/minimax-m3.1-flash"
+    ],
+    "nim-glimmer": [
+      "nvidia",
+      "meta/muse-glimmer-30b"
+    ],
+    "nim-vision": [
+      "nvidia",
+      "meta/llama-3.2-90b-vision-instruct"
+    ],
+    "nim-oss20": [
+      "nvidia",
+      "openai/gpt-oss-20b"
+    ],
+    "vc-lightning-free": [
+      "vercel-gateway",
+      "nvidia/nemotron-3.5-lightning-free"
+    ],
+    "vc-fast": [
+      "vercel-gateway",
+      "morph/morph-v3-fast"
+    ],
+    "vc-ultra": [
+      "vercel-gateway",
+      "nvidia/nemotron-3-ultra-550b-a55b"
+    ],
+    "vc-glm": [
+      "vercel-gateway",
+      "zai/glm-4.7-flash"
+    ],
+    "vc-r1": [
+      "vercel-gateway",
+      "deepseek/deepseek-r1"
+    ],
+    "vc-oss120": [
+      "vercel-gateway",
+      "openai/gpt-oss-120b"
     ]
   },
   "seeds": {
@@ -135,7 +203,10 @@
     "nvidia": [
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
-      "nvidia/ising-calibration-1.5-31b",
+      "meta/llama-3.2-90b-vision-instruct",
+      "meta/llama-guard-4-12b",
+      "minimaxai/minimax-m3.1-flash",
+      "mistralai/mistral-large-4-1t-a52b",
       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
       "nvidia/nemotron-3-ultra-550b-a55b",
       "nvidia/nemotron-3.5-bolt-e4b",
@@ -143,9 +214,17 @@
       "nvidia/nemotron-3.5-lightning-30b-a3b",
       "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
+      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
-      "poolside/laguna-xs-2.1",
-      "z-ai/glm-5.3-flash"
+      "poolside/laguna-xs-2.1"
+    ],
+    "vercel-gateway": [
+      "nvidia/nemotron-3.5-lightning-free",
+      "morph/morph-v3-fast",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "zai/glm-4.7-flash",
+      "deepseek/deepseek-r1",
+      "openai/gpt-oss-120b"
     ],
     "groq": [
       "meta/llama-3.2-11b-vision-instruct",
@@ -904,10 +983,31 @@
             "output": 8192
           }
         },
-        "nvidia/ising-calibration-1.5-31b": {
-          "name": "nvidia/ising-calibration-1.5-31b",
+        "meta/llama-3.2-90b-vision-instruct": {
+          "name": "meta/llama-3.2-90b-vision-instruct",
           "limit": {
-            "context": 131072,
+            "context": 128000,
+            "output": 8192
+          }
+        },
+        "meta/llama-guard-4-12b": {
+          "name": "meta/llama-guard-4-12b",
+          "limit": {
+            "context": 128000,
+            "output": 8192
+          }
+        },
+        "minimaxai/minimax-m3.1-flash": {
+          "name": "minimaxai/minimax-m3.1-flash",
+          "limit": {
+            "context": 128000,
+            "output": 8192
+          }
+        },
+        "mistralai/mistral-large-4-1t-a52b": {
+          "name": "mistralai/mistral-large-4-1t-a52b",
+          "limit": {
+            "context": 128000,
             "output": 8192
           }
         },
@@ -960,6 +1060,13 @@
             "output": 8192
           }
         },
+        "nvidia/riva-translate-4b-instruct-v2": {
+          "name": "nvidia/riva-translate-4b-instruct-v2",
+          "limit": {
+            "context": 128000,
+            "output": 8192
+          }
+        },
         "openai/gpt-oss-20b": {
           "name": "openai/gpt-oss-20b",
           "limit": {
@@ -973,11 +1080,56 @@
             "context": 131072,
             "output": 8192
           }
-        },
-        "z-ai/glm-5.3-flash": {
-          "name": "z-ai/glm-5.3-flash",
+        }
+      }
+    },
+    "vercel-gateway": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Vercel AI Gateway",
+      "options": {
+        "baseURL": "https://ai-gateway.vercel.sh/v1",
+        "apiKey": "{env:AI_GATEWAY_API_KEY}"
+      },
+      "models": {
+        "nvidia/nemotron-3.5-lightning-free": {
+          "name": "nvidia/nemotron-3.5-lightning-free",
           "limit": {
-            "context": 200000,
+            "context": 131072,
+            "output": 8192
+          }
+        },
+        "morph/morph-v3-fast": {
+          "name": "morph/morph-v3-fast",
+          "limit": {
+            "context": 128000,
+            "output": 8192
+          }
+        },
+        "nvidia/nemotron-3-ultra-550b-a55b": {
+          "name": "nvidia/nemotron-3-ultra-550b-a55b",
+          "limit": {
+            "context": 1048576,
+            "output": 8192
+          }
+        },
+        "zai/glm-4.7-flash": {
+          "name": "zai/glm-4.7-flash",
+          "limit": {
+            "context": 128000,
+            "output": 8192
+          }
+        },
+        "deepseek/deepseek-r1": {
+          "name": "deepseek/deepseek-r1",
+          "limit": {
+            "context": 128000,
+            "output": 8192
+          }
+        },
+        "openai/gpt-oss-120b": {
+          "name": "openai/gpt-oss-120b",
+          "limit": {
+            "context": 131072,
             "output": 8192
           }
         }
@@ -5422,6 +5574,17 @@
       "keyEnv": "NVIDIA_API_KEY",
       "keyEnvs": [
         "NVIDIA_API_KEY"
+      ],
+      "adapter": "openai",
+      "auth": "bearer"
+    },
+    {
+      "name": "vercel-gateway",
+      "displayName": "Vercel AI Gateway",
+      "baseUrl": "https://ai-gateway.vercel.sh/v1",
+      "keyEnv": "AI_GATEWAY_API_KEY",
+      "keyEnvs": [
+        "AI_GATEWAY_API_KEY"
       ],
       "adapter": "openai",
       "auth": "bearer"

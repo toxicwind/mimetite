@@ -28,6 +28,13 @@ export interface ProviderDef {
   keyEnv: string;
   /** Alternate env var (multi-key pools), e.g. "NVIDIA_API_KEYS". */
   keyEnvAlt?: string;
+  /**
+   * Real API key shape for this provider (regex), sourced from provider code
+   * and estate probes (2026-11-10 blackbird audit). Used to classify/validate
+   * keys before routing; a key that fails its provider's pattern is rejected
+   * early instead of burning an upstream 401/403 round-trip.
+   */
+  keyPattern?: string;
   /** Which endpoint-shape adapter reads this provider's model list. */
   adapter: AdapterId;
   /** Path appended to baseUrl. Defaults per adapter ("openai" -> "/models"). */
@@ -91,8 +98,19 @@ export interface ProviderDef {
     temperature?: number;
     maxTokens?: number;
     effort?: "low" | "medium" | "high";
+    maxConcurrency?: number;
     headers?: Record<string, string>;
   }>;
+
+  /**
+   * Quota-aware scheduling (2026-10-28, freeinference pro plan): daily spend
+   * ceiling in cents ($160/day pro = 16000) and the keypool endpoint that
+   * reports live remaining budget (UTC-midnight reset). Routers consult
+   * dailyBudgetCents before assigning long agent loops; quotaSource is the
+   * authoritative remaining-cents source.
+   */
+  dailyBudgetCents?: number;
+  quotaSource?: string;
 
   /**
    * Client-identity class the strategy layer must materialize per request

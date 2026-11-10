@@ -607,6 +607,7 @@ var PROVIDER_DEFS = [
     displayName: "Moonshot AI",
     baseUrl: "https://api.moonshot.ai/v1",
     keyEnv: "MOONSHOT_API_KEY",
+    keyPattern: "^sk-[A-Za-z0-9]{48}$",
     auth: "bearer",
     adapter: "openai",
     seeds: [
@@ -691,7 +692,10 @@ var PROVIDER_DEFS = [
     seeds: [
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
-      "nvidia/ising-calibration-1.5-31b",
+      "meta/llama-3.2-90b-vision-instruct",
+      "meta/llama-guard-4-12b",
+      "minimaxai/minimax-m3.1-flash",
+      "mistralai/mistral-large-4-1t-a52b",
       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
       "nvidia/nemotron-3-ultra-550b-a55b",
       "nvidia/nemotron-3.5-bolt-e4b",
@@ -699,9 +703,9 @@ var PROVIDER_DEFS = [
       "nvidia/nemotron-3.5-lightning-30b-a3b",
       "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
+      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
-      "poolside/laguna-xs-2.1",
-      "z-ai/glm-5.3-flash"
+      "poolside/laguna-xs-2.1"
     ],
     contextLengths: {
       "meta/llama-3.2-11b-vision-instruct": 131072,
@@ -717,6 +721,27 @@ var PROVIDER_DEFS = [
       "openai/gpt-oss-20b": 131072,
       "poolside/laguna-xs-2.1": 131072,
       "z-ai/glm-5.3-flash": 200000
+    }
+  },
+  {
+    name: "vercel-gateway",
+    displayName: "Vercel AI Gateway",
+    baseUrl: "https://ai-gateway.vercel.sh/v1",
+    keyEnv: "AI_GATEWAY_API_KEY",
+    auth: "bearer",
+    adapter: "openai",
+    seeds: [
+      "nvidia/nemotron-3.5-lightning-free",
+      "morph/morph-v3-fast",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "zai/glm-4.7-flash",
+      "deepseek/deepseek-r1",
+      "openai/gpt-oss-120b"
+    ],
+    contextLengths: {
+      "nvidia/nemotron-3.5-lightning-free": 131072,
+      "nvidia/nemotron-3-ultra-550b-a55b": 1048576,
+      "openai/gpt-oss-120b": 131072
     }
   },
   {
@@ -1172,6 +1197,7 @@ var PROVIDER_DEFS = [
     displayName: "opencode zen (free tier)",
     baseUrl: "https://opencode.ai/zen/v1",
     keyEnv: "OPENCODE_API_KEY",
+    keyPattern: "^sk-[A-Za-z0-9_-]{20,}$",
     auth: "bearer",
     adapter: "openai",
     clientIdentity: "opencode",
@@ -1331,6 +1357,7 @@ var PROVIDER_DEFS = [
     displayName: "Chutes",
     baseUrl: "https://llm.chutes.ai/v1",
     keyEnv: "CHUTES_API_KEY",
+    keyPattern: "^[A-Za-z0-9_-]{20,}$",
     auth: "bearer",
     adapter: "openai",
     seeds: [
@@ -1400,6 +1427,7 @@ var PROVIDER_DEFS = [
     displayName: "Cohere",
     baseUrl: "https://api.cohere.com/compatibility/v1",
     keyEnv: "COHERE_API_KEY",
+    keyPattern: "^[A-Za-z0-9_-]{40}$",
     auth: "bearer",
     adapter: "openai",
     seeds: [
@@ -1567,6 +1595,7 @@ var PROVIDER_DEFS = [
     displayName: "GitHub Models",
     baseUrl: "https://models.github.ai/inference",
     keyEnv: "GITHUB_TOKEN",
+    keyPattern: "^(gh[opsu]_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{50,})$",
     auth: "bearer",
     adapter: "openai",
     seeds: [
@@ -1590,6 +1619,7 @@ var PROVIDER_DEFS = [
     displayName: "Parasail",
     baseUrl: "https://api.parasail.io/v1",
     keyEnv: "PARASAIL_API_KEY",
+    keyPattern: "^[A-Za-z0-9_-]{20,}$",
     auth: "bearer",
     adapter: "openai",
     seeds: [
@@ -1861,7 +1891,24 @@ var MODEL_ALIASES = {
   "gemini-2.5-flash": ["google", "models/gemini-2.5-flash"],
   "groq-gpt-oss-120b": ["groq", "openai/gpt-oss-120b"],
   "groq-gpt-oss-20b": ["groq", "openai/gpt-oss-20b"],
-  "groq-qwen3.8-27b": ["groq", "qwen/qwen3.8-27b"]
+  "groq-qwen3.8-27b": ["groq", "qwen/qwen3.8-27b"],
+  "groq-llama-4-scout": ["groq", "meta-llama/llama-4-scout-17b-16e-instruct"],
+  "nim-lightning": ["nvidia", "nvidia/nemotron-3.5-lightning-30b-a3b"],
+  "nim-snap": ["nvidia", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"],
+  "nim-bolt": ["nvidia", "nvidia/nemotron-3.5-bolt-e4b"],
+  "nim-laguna": ["nvidia", "poolside/laguna-xs-2.1"],
+  "nim-supervl": ["nvidia", "nvidia/nemotron-3.5-super-vl-120b-a12b"],
+  "nim-mistral4": ["nvidia", "mistralai/mistral-large-4-1t-a52b"],
+  "nim-minimax": ["nvidia", "minimaxai/minimax-m3.1-flash"],
+  "nim-glimmer": ["nvidia", "meta/muse-glimmer-30b"],
+  "nim-vision": ["nvidia", "meta/llama-3.2-90b-vision-instruct"],
+  "nim-oss20": ["nvidia", "openai/gpt-oss-20b"],
+  "vc-lightning-free": ["vercel-gateway", "nvidia/nemotron-3.5-lightning-free"],
+  "vc-fast": ["vercel-gateway", "morph/morph-v3-fast"],
+  "vc-ultra": ["vercel-gateway", "nvidia/nemotron-3-ultra-550b-a55b"],
+  "vc-glm": ["vercel-gateway", "zai/glm-4.7-flash"],
+  "vc-r1": ["vercel-gateway", "deepseek/deepseek-r1"],
+  "vc-oss120": ["vercel-gateway", "openai/gpt-oss-120b"]
 };
 var DEAD_MODEL_IDS = [
   "moonshotai/kimi-k2-instruct",
@@ -2498,8 +2545,8 @@ function buildRoutesContract(input) {
           modelProvider: mp.name,
           baseUrl: mp.baseUrl,
           api: "openai-completions",
-          auth: mp.auth,
-          keyEnv: mp.keyEnv,
+          auth: mp.auth ?? "bearer",
+          keyEnv: mp.keyEnv ?? "",
           seeds: mp.seeds ?? [],
           healthPath: modelsPathFor(base),
           healthOk: [200, 401],
@@ -2514,8 +2561,8 @@ function buildRoutesContract(input) {
       modelProvider: null,
       baseUrl: d.baseUrl,
       api: d.adapter === "google-v1beta" ? "google-v1beta" : "openai-completions",
-      auth: d.auth,
-      keyEnv: d.keyEnv,
+      auth: d.auth ?? "bearer",
+      keyEnv: d.keyEnv ?? "",
       seeds: d.seeds ?? [],
       healthPath: modelsPathFor(base),
       healthOk: [200, 401],

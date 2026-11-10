@@ -90,6 +90,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     displayName: "Moonshot AI",
     baseUrl: "https://api.moonshot.ai/v1",
     keyEnv: "MOONSHOT_API_KEY",
+    keyPattern: "^sk-[A-Za-z0-9]{48}$",
     auth: "bearer",
     adapter: "openai",
     seeds: [
@@ -235,7 +236,10 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     seeds: [
       "meta/llama-3.2-11b-vision-instruct",
       "meta/muse-glimmer-30b",
-      "nvidia/ising-calibration-1.5-31b",
+      "meta/llama-3.2-90b-vision-instruct",
+      "meta/llama-guard-4-12b",
+      "minimaxai/minimax-m3.1-flash",
+      "mistralai/mistral-large-4-1t-a52b",
       "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
       "nvidia/nemotron-3-ultra-550b-a55b",
       "nvidia/nemotron-3.5-bolt-e4b",
@@ -243,9 +247,9 @@ export const PROVIDER_DEFS: ProviderDef[] = [
       "nvidia/nemotron-3.5-lightning-30b-a3b",
       "nvidia/nemotron-3.5-super-vl-120b-a12b",
       "nvidia/nemotron-parse-2.0",
+      "nvidia/riva-translate-4b-instruct-v2",
       "openai/gpt-oss-20b",
-      "poolside/laguna-xs-2.1",
-      "z-ai/glm-5.3-flash",
+      "poolside/laguna-xs-2.1"
     ],
     // NIM publishes NO context lengths in /v1/models (every entry is null),
     // so blind discovery hands tau a card with no window -> sessions
@@ -266,6 +270,30 @@ export const PROVIDER_DEFS: ProviderDef[] = [
       "openai/gpt-oss-20b": 131072,
       "poolside/laguna-xs-2.1": 131072,
       "z-ai/glm-5.3-flash": 200000,
+    },
+  },
+  {
+    // Vercel AI Gateway (2026-11-10): 505-model catalog, 104 usable on free
+    // tier (~20 RPM effective — 429s at 1.5s pacing, backoff 2/4/8s works).
+    // "nvidia" ids here route via baseten/deepinfra, NOT NIM hardware.
+    name: "vercel-gateway",
+    displayName: "Vercel AI Gateway",
+    baseUrl: "https://ai-gateway.vercel.sh/v1",
+    keyEnv: "AI_GATEWAY_API_KEY",
+    auth: "bearer",
+    adapter: "openai",
+    seeds: [
+      "nvidia/nemotron-3.5-lightning-free",
+      "morph/morph-v3-fast",
+      "nvidia/nemotron-3-ultra-550b-a55b",
+      "zai/glm-4.7-flash",
+      "deepseek/deepseek-r1",
+      "openai/gpt-oss-120b",
+    ],
+    contextLengths: {
+      "nvidia/nemotron-3.5-lightning-free": 131072,
+      "nvidia/nemotron-3-ultra-550b-a55b": 1048576,
+      "openai/gpt-oss-120b": 131072,
     },
   },
   {
@@ -866,6 +894,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     displayName: "opencode zen (free tier)",
     baseUrl: "https://opencode.ai/zen/v1",
     keyEnv: "OPENCODE_API_KEY",
+    keyPattern: "^sk-[A-Za-z0-9_-]{20,}$",
     auth: "bearer",
     adapter: "openai",
     // Dynamic client identity (2026-10-27): the strategy layer materializes
@@ -1073,6 +1102,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     displayName: "Chutes",
     baseUrl: "https://llm.chutes.ai/v1",
     keyEnv: "CHUTES_API_KEY",
+    keyPattern: "^[A-Za-z0-9_-]{20,}$",
     auth: "bearer",
     adapter: "openai",
     // /v1/models 401s without a key (verified live 2026-09-30) — decentralized
@@ -1162,6 +1192,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     displayName: "Cohere",
     baseUrl: "https://api.cohere.com/compatibility/v1",
     keyEnv: "COHERE_API_KEY",
+    keyPattern: "^[A-Za-z0-9_-]{40}$",
     auth: "bearer",
     adapter: "openai",
     // /compatibility/v1/models 401s without a key (verified live 2026-09-30).
@@ -1384,6 +1415,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     // 2026-10-02: models.inference.ai.azure.com is DNS-dead; GitHub Models moved to models.github.ai.
     baseUrl: "https://models.github.ai/inference",
     keyEnv: "GITHUB_TOKEN",
+    keyPattern: "^(gh[opsu]_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{50,})$",
     auth: "bearer",
     adapter: "openai",
     // OBSERVED 2026-10-26 (direct NIM, our entitled key, one chat probe each):
@@ -1413,6 +1445,7 @@ export const PROVIDER_DEFS: ProviderDef[] = [
     displayName: "Parasail",
     baseUrl: "https://api.parasail.io/v1",
     keyEnv: "PARASAIL_API_KEY",
+    keyPattern: "^[A-Za-z0-9_-]{20,}$",
     auth: "bearer",
     adapter: "openai",
     // /v1/models 401s without a key (verified live 2026-09-30) — serverless
@@ -1789,6 +1822,24 @@ export const MODEL_ALIASES: Record<string, ModelAlias> = {
   "groq-gpt-oss-120b": ["groq", "openai/gpt-oss-120b"],
   "groq-gpt-oss-20b": ["groq", "openai/gpt-oss-20b"],
   "groq-qwen3.8-27b": ["groq", "qwen/qwen3.8-27b"],
+  "groq-llama-4-scout": ["groq", "meta-llama/llama-4-scout-17b-16e-instruct"],
+  // ── hermes targets (2026-11-10 keydiff: 14 NIM-usable both-keys) ──
+  "nim-lightning": ["nvidia", "nvidia/nemotron-3.5-lightning-30b-a3b"],
+  "nim-snap": ["nvidia", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"],
+  "nim-bolt": ["nvidia", "nvidia/nemotron-3.5-bolt-e4b"],
+  "nim-laguna": ["nvidia", "poolside/laguna-xs-2.1"],
+  "nim-supervl": ["nvidia", "nvidia/nemotron-3.5-super-vl-120b-a12b"],
+  "nim-mistral4": ["nvidia", "mistralai/mistral-large-4-1t-a52b"],
+  "nim-minimax": ["nvidia", "minimaxai/minimax-m3.1-flash"],
+  "nim-glimmer": ["nvidia", "meta/muse-glimmer-30b"],
+  "nim-vision": ["nvidia", "meta/llama-3.2-90b-vision-instruct"],
+  "nim-oss20": ["nvidia", "openai/gpt-oss-20b"],
+  "vc-lightning-free": ["vercel-gateway", "nvidia/nemotron-3.5-lightning-free"],
+  "vc-fast": ["vercel-gateway", "morph/morph-v3-fast"],
+  "vc-ultra": ["vercel-gateway", "nvidia/nemotron-3-ultra-550b-a55b"],
+  "vc-glm": ["vercel-gateway", "zai/glm-4.7-flash"],
+  "vc-r1": ["vercel-gateway", "deepseek/deepseek-r1"],
+  "vc-oss120": ["vercel-gateway", "openai/gpt-oss-120b"],
 };
 
 /**
